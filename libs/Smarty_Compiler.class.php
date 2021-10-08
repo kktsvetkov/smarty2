@@ -994,7 +994,7 @@ class Smarty_Compiler extends Smarty {
 
         $_params = "array('smarty_file' => " . $attrs['file'] . ", 'smarty_assign' => '$assign_var', 'smarty_once' => $once_var, 'smarty_include_vars' => array(".implode(',', $arg_list)."))";
 
-        return "<?php require_once(SMARTY_CORE_DIR . 'core.smarty_include_php.php');\nsmarty_core_smarty_include_php($_params, \$this); ?>" . $this->_additional_newline;
+        return "<?php Smarty_Core::smarty_include_php($_params, \$this); ?>" . $this->_additional_newline;
     }
 
 
