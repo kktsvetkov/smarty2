@@ -29,7 +29,7 @@ class Smarty
         *
         * @var string
         */
-        var $_version = '2.6.32';
+        var $_version = '2.6.33';
 
     /**#@+
      * Smarty Configuration Section
@@ -1488,7 +1488,7 @@ class Smarty
             if (!$params['quiet']) {
                 $this->trigger_error('unable to read resource: "' . $params['resource_name'] . '"');
             }
-        } 
+        }
         return $_return;
     }
 
