@@ -32,6 +32,48 @@ chown nobody:nobody templates_c;
 chmod 700 templates_c
 ```
 
+## Debugging
+
+The debugging console is removed. The debugging stats are collected in
+the `Smarty::$_smarty_debug_info` array, and you can inspect and render
+them in whatever way is best for you -- for examples something like this:
+
+```php
+...
+$smarty->display('index.tpl');
+print_r($smarty->_smarty_debug_info);
+```
+and the output will be something similar to this:
+```
+Array
+(
+    [0] => Array
+        (
+            [type] => template
+            [filename] => index.tpl
+            [depth] => 0
+            [exec_time] => 0.0049879550933838
+        )
+
+    [1] => Array
+        (
+            [type] => template
+            [filename] => header.tpl
+            [depth] => 1
+            [exec_time] => 7.2002410888672E-5
+        )
+
+    [2] => Array
+        (
+            [type] => template
+            [filename] => footer.tpl
+            [depth] => 1
+            [exec_time] => 6.103515625E-5
+        )
+
+)
+```
+
 ## From Original README
 
 **What is Smarty?**

@@ -64,9 +64,8 @@ class Smarty
     var $plugins_dir     =  array('plugins');
 
     /**
-     * If debugging is enabled, a debug console window will display
-     * when the page loads (make sure your browser allows unrequested
-     * popup windows)
+     * If debugging is enabled, debugging stats will be collected in
+     * {@link Smarty::$_smarty_debug_info}
      *
      * @var boolean
      */
