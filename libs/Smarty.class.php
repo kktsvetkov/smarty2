@@ -1,38 +1,6 @@
 <?php
 
 /**
- * Project:     Smarty: the PHP compiling template engine
- * File:        Smarty.class.php
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * For questions, help, comments, discussion, etc., please join the
- * Smarty mailing list. Send a blank e-mail to
- * smarty-discussion-subscribe@googlegroups.com
- *
- * @link http://www.smarty.net/
- * @copyright 2001-2005 New Digital Group, Inc.
- * @author Monte Ohrt <monte at ohrt dot com>
- * @author Andrei Zmievski <andrei@php.net>
- * @package Smarty
- * @version 2.6.31-dev
- */
-
-/* $Id$ */
-
-/**
  * DIR_SEP isn't used anymore, but third party apps might
  */
 if(!defined('DIR_SEP')) {
@@ -63,6 +31,13 @@ define('SMARTY_PHP_ALLOW',      3);
  */
 class Smarty
 {
+        /**
+        * Smarty version number
+        *
+        * @var string
+        */
+        var $_version = '2.6.32';
+
     /**#@+
      * Smarty Configuration Section
      */
@@ -459,13 +434,6 @@ class Smarty
      * @var string
      */
     var $_smarty_md5           = 'f8d698aea36fcbead2b9d5359ffca76f';
-
-    /**
-     * Smarty version number
-     *
-     * @var string
-     */
-    var $_version              = '2.6.31';
 
     /**
      * current template inclusion depth
