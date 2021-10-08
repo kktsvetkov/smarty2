@@ -431,14 +431,7 @@ class Smarty
     var $_compile_id           = null;
 
     /**
-     * text in URL to enable debug mode
-     *
-     * @var string
-     */
-    var $_smarty_debug_id      = 'SMARTY_DEBUG';
-
-    /**
-     * debugging information for debug console
+     * collected debugging information
      *
      * @var array
      */
