@@ -103,7 +103,6 @@ Some of Smarty's features:
   architecture.
 * configurable template delimiter tag syntax, so you can use
   `{}`, `{{}}`, `<!--{}-->`, or whatever you like.
-* built-in caching of template output.
 * arbitrary template sources (filesystem, databases, etc.)
 * template if/elseif/else/endif constructs are passed to the PHP parser,
   so the if syntax can be as simple or as complex as you like.
