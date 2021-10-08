@@ -20,8 +20,7 @@ function smarty_core_process_cached_inserts($params, &$smarty)
     for ($i = 0, $for_max = count($cached_inserts); $i < $for_max; $i++) {
         if ($smarty->debugging) {
             $_params = array();
-            require_once(SMARTY_CORE_DIR . 'core.get_microtime.php');
-            $debug_start_time = smarty_core_get_microtime($_params, $smarty);
+            $debug_start_time = microtime(true);
         }
 
         $args = unserialize($insert_args[$i]);
@@ -59,7 +58,7 @@ function smarty_core_process_cached_inserts($params, &$smarty)
             $smarty->_smarty_debug_info[] = array('type'      => 'insert',
                                                 'filename'  => 'insert_'.$name,
                                                 'depth'     => $smarty->_inclusion_depth,
-                                                'exec_time' => smarty_core_get_microtime($_params, $smarty) - $debug_start_time);
+                                                'exec_time' => microtime(true) - $debug_start_time);
         }
     }
 
