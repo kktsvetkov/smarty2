@@ -161,15 +161,6 @@ class Smarty
     var $security       =   false;
 
     /**
-     * This is the list of template directories that are considered secure. This
-     * is used only if {@link $security} is enabled. One directory per array
-     * element.  {@link $template_dir} is in this list implicitly.
-     *
-     * @var array
-     */
-    var $secure_dir     =   array();
-
-    /**
      * These are the security settings for Smarty. They are used only when
      * {@link $security} is enabled.
      *
@@ -182,7 +173,6 @@ class Smarty
                                                                'count', 'sizeof',
                                                                'in_array', 'is_array',
                                                                'true', 'false', 'null'),
-                                    'INCLUDE_ANY'     => false,
                                     'PHP_TAGS'        => false,
                                     'MODIFIER_FUNCS'  => array('count'),
                                     'ALLOW_CONSTANTS'  => false,
@@ -1378,7 +1368,7 @@ class Smarty
         $smarty_compiler->right_delimiter   = $this->right_delimiter;
         $smarty_compiler->_version          = $this->_version;
         $smarty_compiler->security          = $this->security;
-        $smarty_compiler->secure_dir        = $this->secure_dir;
+
         $smarty_compiler->security_settings = $this->security_settings;
 
         $smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
@@ -1498,16 +1488,7 @@ class Smarty
             if (!$params['quiet']) {
                 $this->trigger_error('unable to read resource: "' . $params['resource_name'] . '"');
             }
-        } else if ($_return && $this->security) {
-            require_once(SMARTY_CORE_DIR . 'core.is_secure.php');
-            if (!smarty_core_is_secure($_params, $this)) {
-                if (!$params['quiet'])
-                    $this->trigger_error('(secure mode) accessing "' . $params['resource_name'] . '" is not allowed');
-                $params['source_content'] = null;
-                $params['resource_timestamp'] = null;
-                return false;
-            }
-        }
+        } 
         return $_return;
     }
 
