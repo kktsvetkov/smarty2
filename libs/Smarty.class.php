@@ -309,14 +309,6 @@ class Smarty
     var $default_template_handler_func = '';
 
     /**
-     * The file that contains the compiler class. This can a full
-     * pathname, or relative to the php_include path.
-     *
-     * @var string
-     */
-    var $compiler_file        =    'Smarty_Compiler.class.php';
-
-    /**
      * The class used for compiling templates.
      *
      * @var string
@@ -1347,13 +1339,6 @@ class Smarty
      */
     function _compile_source($resource_name, &$source_content, &$compiled_content, $cache_include_path=null)
     {
-        if (file_exists(SMARTY_DIR . $this->compiler_file)) {
-            require_once(SMARTY_DIR . $this->compiler_file);
-        } else {
-            // use include_path
-            require_once($this->compiler_file);
-        }
-
 
         $smarty_compiler = new $this->compiler_class;
 
