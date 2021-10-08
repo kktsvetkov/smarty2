@@ -95,17 +95,6 @@ class Smarty
     var $debug_tpl       =  '';
 
     /**
-     * This determines if debugging is enable-able from the browser.
-     * <ul>
-     *  <li>NONE => no debugging control allowed</li>
-     *  <li>URL => enable debugging when SMARTY_DEBUG is found in the URL.</li>
-     * </ul>
-     * @link http://www.foo.dom/index.php?SMARTY_DEBUG
-     * @var string
-     */
-    var $debugging_ctrl  =  'NONE';
-
-    /**
      * This tells Smarty whether to check for recompiling or not. Recompiling
      * does not need to happen unless a template or config file is changed.
      * Typically you enable this during development, and disable for
@@ -1095,26 +1084,6 @@ class Smarty
 
         $_smarty_old_error_level = $this->debugging ? error_reporting() : error_reporting(isset($this->error_reporting)
                ? $this->error_reporting : error_reporting() & ~E_NOTICE);
-
-        if (!$this->debugging && $this->debugging_ctrl == 'URL') {
-            $_query_string = $this->request_use_auto_globals ? $_SERVER['QUERY_STRING'] : $GLOBALS['HTTP_SERVER_VARS']['QUERY_STRING'];
-            if (@strstr($_query_string, $this->_smarty_debug_id)) {
-                if (@strstr($_query_string, $this->_smarty_debug_id . '=on')) {
-                    // enable debugging for this browser session
-                    @setcookie('SMARTY_DEBUG', true);
-                    $this->debugging = true;
-                } elseif (@strstr($_query_string, $this->_smarty_debug_id . '=off')) {
-                    // disable debugging for this browser session
-                    @setcookie('SMARTY_DEBUG', false);
-                    $this->debugging = false;
-                } else {
-                    // enable debugging for this page
-                    $this->debugging = true;
-                }
-            } else {
-                $this->debugging = (bool)($this->request_use_auto_globals ? @$_COOKIE['SMARTY_DEBUG'] : @$GLOBALS['HTTP_COOKIE_VARS']['SMARTY_DEBUG']);
-            }
-        }
 
         if ($this->debugging) {
             // capture time for debugging info
