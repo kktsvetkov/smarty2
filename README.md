@@ -1,5 +1,11 @@
 # Smarty 2 - the PHP compiling template engine
 
+This is a fork from [**Smarty 2.6.31**](https://github.com/smarty-php/smarty/tree/v2.6.31).
+I am involved in a project that is heavily integrated with this version of the
+library and I wanted to clean it up and make some changes to it. Mainly the changes
+involve removing outdated features and other things we do not use, but also
+improving some of the codebase and bring it closely to the state of PHP in the 2020s.
+
 ## Installation
 
 To get the latest stable version add this in your `composer.json` file:
