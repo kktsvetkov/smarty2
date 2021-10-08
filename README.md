@@ -2,13 +2,16 @@
 
 ## Installation
 
-To get the latest stable version use
+To get the latest stable version add this in your `composer.json` file:
 ```
 	"require": {
 	   "kktsvetkov/smarty2": "~2.6"
 	}
 ```
-in your `composer.json` file.
+or you can just use the composer tool:
+```
+php composer.phar require kktsvetkov/smarty2
+```
 
 Additionally you will need to create few folders. Using the default
 settings, those folders are "templates" (to read the templates from),
