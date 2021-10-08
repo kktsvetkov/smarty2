@@ -20,8 +20,10 @@ define('SMARTY_PHP_REMOVE',     2);
 define('SMARTY_PHP_ALLOW',      3);
 
 /**
- * @package Smarty
- */
+* Smarty2 - the PHP template engine 
+*
+* @package Smarty2
+*/
 class Smarty
 {
         /**

@@ -37,10 +37,10 @@ function smarty_core_write_cache_file($params, &$smarty)
         // and replace it by a single nocache-tag
         // this new nocache-tag will be replaced by dynamic contents in
         // smarty_core_process_compiled_includes() on a cache-read
-        
+
         $match_count = count($match[0]);
         $results = preg_split('!(\{/?nocache\:[0-9a-f]{32}#\d+\})!', $params['results'], -1, PREG_SPLIT_DELIM_CAPTURE);
-        
+
         $level = 0;
         $j = 0;
         for ($i=0, $results_count = count($results); $i < $results_count && $j < $match_count; $i++) {
@@ -85,12 +85,8 @@ function smarty_core_write_cache_file($params, &$smarty)
         $_auto_id = $smarty->_get_auto_id($params['cache_id'], $params['compile_id']);
         $_cache_file = $smarty->_get_auto_filename($smarty->cache_dir, $params['tpl_file'], $_auto_id);
         $_params = array('filename' => $_cache_file, 'contents' => $params['results'], 'create_dirs' => true);
-        require_once(SMARTY_CORE_DIR . 'core.write_file.php');
-        smarty_core_write_file($_params, $smarty);
+
+        Smarty_Core::write_file($_params, $smarty);
         return true;
     }
 }
-
-/* vim: set expandtab: */
-
-?>

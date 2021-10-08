@@ -20,7 +20,7 @@ function smarty_core_write_compiled_include($params, &$smarty)
 
     preg_match_all('!('.$_tag_start.'(.*)'.$_tag_end.')!Us',
                    $params['compiled_content'], $_match_source, PREG_SET_ORDER);
-    
+
     // no nocache-parts found: done
     if (count($_match_source)==0) return;
 
@@ -62,7 +62,7 @@ function smarty_core_write_compiled_include($params, &$smarty)
                         $tokens[$i] = '$' . $this_varname;
                     } else {
                         $tokens[$i] = $tokens[$i][1];
-                    }                   
+                    }
                 }
             }
             $source = implode('', $tokens);
@@ -82,10 +82,6 @@ $source
     $_params = array('filename' => $_compile_path,
                      'contents' => $_include_compiled, 'create_dirs' => true);
 
-    require_once(SMARTY_CORE_DIR . 'core.write_file.php');
-    smarty_core_write_file($_params, $smarty);
+    Smarty_Core::write_file($_params, $smarty);
     return true;
 }
-
-
-?>

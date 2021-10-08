@@ -25,7 +25,8 @@
         "autoload": {
                 "classmap": [
                         "libs/Smarty.class.php",
-                        "libs/Smarty_Compiler.class.php"
+                        "libs/Smarty_Compiler.class.php",
+                        "libs/Smarty_Core.class.php"
                 ]
         }
 }
