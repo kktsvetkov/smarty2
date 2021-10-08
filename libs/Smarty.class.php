@@ -121,16 +121,6 @@ class Smarty
     var $cache_lifetime  =  3600;
 
     /**
-     * Only used when $caching is enabled. If true, then If-Modified-Since headers
-     * are respected with cached content, and appropriate HTTP headers are sent.
-     * This way repeated hits to a cached page do not send the entire page to the
-     * client every time.
-     *
-     * @var boolean
-     */
-    var $cache_modified_check = false;
-
-    /**
      * This determines how Smarty handles "<?php ... ?>" tags in templates.
      * possible values:
      * <ul>
@@ -1044,25 +1034,9 @@ class Smarty
                         $this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = microtime(true) - $_debug_start_time;
 
                     }
-                    if ($this->cache_modified_check) {
-                        $_server_vars =  $_SERVER ;
-                        $_last_modified_date = @substr($_server_vars['HTTP_IF_MODIFIED_SINCE'], 0, strpos($_server_vars['HTTP_IF_MODIFIED_SINCE'], 'GMT') + 3);
-                        $_gmt_mtime = gmdate('D, d M Y H:i:s', $this->_cache_info['timestamp']).' GMT';
-                        if (@count($this->_cache_info['insert_tags']) == 0
-                            && !$this->_cache_serials
-                            && $_gmt_mtime == $_last_modified_date) {
-                            if (php_sapi_name()=='cgi')
-                                header('Status: 304 Not Modified');
-                            else
-                                header('HTTP/1.1 304 Not Modified');
 
-                        } else {
-                            header('Last-Modified: '.$_gmt_mtime);
-                            echo $_smarty_results;
-                        }
-                    } else {
-                            echo $_smarty_results;
-                    }
+                echo $_smarty_results;
+
                     error_reporting($_smarty_old_error_level);
                     // restore initial cache_info
                     $this->_cache_info = array_pop($_cache_info);
@@ -1075,9 +1049,6 @@ class Smarty
                 }
             } else {
                 $this->_cache_info['template'][$resource_name] = true;
-                if ($this->cache_modified_check && $display) {
-                    header('Last-Modified: '.gmdate('D, d M Y H:i:s', time()).' GMT');
-                }
             }
         }
 
