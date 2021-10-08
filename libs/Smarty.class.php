@@ -92,35 +92,6 @@ class Smarty
     var $force_compile   =  false;
 
     /**
-     * This enables template caching.
-     * <ul>
-     *  <li>0 = no caching</li>
-     *  <li>1 = use class cache_lifetime value</li>
-     *  <li>2 = use cache_lifetime in cache file</li>
-     * </ul>
-     * @var integer
-     */
-    var $caching         =  0;
-
-    /**
-     * The name of the directory for cache files.
-     *
-     * @var string
-     */
-    var $cache_dir       =  'cache';
-
-    /**
-     * This is the number of seconds cached content will persist.
-     * <ul>
-     *  <li>0 = always regenerate cache</li>
-     *  <li>-1 = never expires</li>
-     * </ul>
-     *
-     * @var integer
-     */
-    var $cache_lifetime  =  3600;
-
-    /**
      * This determines how Smarty handles "<?php ... ?>" tags in templates.
      * possible values:
      * <ul>
@@ -290,13 +261,6 @@ class Smarty
     var $_config = array();
 
     /**
-     * md5 checksum of the string 'Smarty'
-     *
-     * @var string
-     */
-    var $_smarty_md5           = 'f8d698aea36fcbead2b9d5359ffca76f';
-
-    /**
      * current template inclusion depth
      *
      * @var integer
@@ -316,13 +280,6 @@ class Smarty
      * @var array
      */
     var $_smarty_debug_info    = array();
-
-    /**
-     * info that makes up a cache file
-     *
-     * @var array
-     */
-    var $_cache_info           = array();
 
     /**
      * default file permissions
@@ -360,29 +317,6 @@ class Smarty
                                        'outputfilter'  => array(),
                                        'resource'      => array(),
                                        'insert'        => array());
-
-
-    /**
-     * cache serials
-     *
-     * @var array
-     */
-    var $_cache_serials = array();
-
-    /**
-     * name of optional cache include file
-     *
-     * @var string
-     */
-    var $_cache_include = null;
-
-    /**
-     * indicate if the current code is used in a compiled
-     * include
-     *
-     * @var string
-     */
-    var $_cache_including = false;
 
     /**
      * plugin filepath cache
@@ -516,10 +450,10 @@ class Smarty
      * @param string $function the name of the template function
      * @param string $function_impl the name of the PHP function to register
      */
-    function register_function($function, $function_impl, $cacheable=true, $cache_attrs=null)
+    function register_function($function, $function_impl )
     {
         $this->_plugins['function'][$function] =
-            array($function_impl, null, null, false, $cacheable, $cache_attrs);
+            array($function_impl, null, null, false);
 
     }
 
@@ -567,10 +501,10 @@ class Smarty
      * @param string $block name of template block
      * @param string $block_impl PHP function to register
      */
-    function register_block($block, $block_impl, $cacheable=true, $cache_attrs=null)
+    function register_block($block, $block_impl)
     {
         $this->_plugins['block'][$block] =
-            array($block_impl, null, null, false, $cacheable, $cache_attrs);
+            array($block_impl, null, null, false);
     }
 
     /**
@@ -753,70 +687,28 @@ class Smarty
     }
 
     /**
-     * clear cached content for the given template and cache id
-     *
-     * @param string $tpl_file name of template file
-     * @param string $cache_id name of cache_id
-     * @param string $compile_id name of compile_id
-     * @param string $exp_time expiration time
-     * @return boolean
+     * {@deprecated}
      */
-    function clear_cache($tpl_file = null, $cache_id = null, $compile_id = null, $exp_time = null)
+    function clear_cache()
     {
-
-        if (!isset($compile_id))
-            $compile_id = $this->compile_id;
-
-        if (!isset($tpl_file))
-            $compile_id = null;
-
-        $_auto_id = $this->_get_auto_id($cache_id, $compile_id);
-        $_params = array('auto_base' => $this->cache_dir,
-                            'auto_source' => $tpl_file,
-                            'auto_id' => $_auto_id,
-                            'exp_time' => $exp_time);
-            require_once(SMARTY_CORE_DIR . 'core.rm_auto.php');
-            return smarty_core_rm_auto($_params, $this);
-    }
-
-
-    /**
-     * clear the entire contents of cache (all templates)
-     *
-     * @param string $exp_time expire time
-     * @return boolean results of {@link smarty_core_rm_auto()}
-     */
-    function clear_all_cache($exp_time = null)
-    {
-        return $this->clear_cache(null, null, null, $exp_time);
-    }
-
-
-    /**
-     * test to see if valid cache exists for this template
-     *
-     * @param string $tpl_file name of template file
-     * @param string $cache_id
-     * @param string $compile_id
-     * @return string|false results of {@link _read_cache_file()}
-     */
-    function is_cached($tpl_file, $cache_id = null, $compile_id = null)
-    {
-        if (!$this->caching)
             return false;
-
-        if (!isset($compile_id))
-            $compile_id = $this->compile_id;
-
-        $_params = array(
-            'tpl_file' => $tpl_file,
-            'cache_id' => $cache_id,
-            'compile_id' => $compile_id
-        );
-        require_once(SMARTY_CORE_DIR . 'core.read_cache_file.php');
-        return smarty_core_read_cache_file($_params, $this);
     }
 
+    /**
+     * {@deprecated}
+     */
+    function clear_all_cache()
+    {
+        return false;
+    }
+
+    /**
+     * {@deprecated}
+     */
+    function is_cached()
+    {
+            return false;
+    }
 
     /**
      * clear all the assigned template variables.
@@ -943,26 +835,24 @@ class Smarty
      * executes & displays the template results
      *
      * @param string $resource_name
-     * @param string $cache_id
+     * @param string $deprecated_cache_id
      * @param string $compile_id
      */
-    function display($resource_name, $cache_id = null, $compile_id = null)
+    function display($resource_name, $deprecated_cache_id = null, $compile_id = null)
     {
-        $this->fetch($resource_name, $cache_id, $compile_id, true);
+        $this->fetch($resource_name, $deprecated_cache_id, $compile_id, true);
     }
 
     /**
      * executes & returns or displays the template results
      *
      * @param string $resource_name
-     * @param string $cache_id
+     * @param string $deprecated_cache_id
      * @param string $compile_id
      * @param boolean $display
      */
-    function fetch($resource_name, $cache_id = null, $compile_id = null, $display = false)
+    function fetch($resource_name, $deprecated_cache_id = null, $compile_id = null, $display = false)
     {
-        static $_cache_info = array();
-
         $_smarty_old_error_level = $this->debugging ? error_reporting() : error_reporting(isset($this->error_reporting)
                ? $this->error_reporting : error_reporting() & ~E_NOTICE);
 
@@ -984,60 +874,6 @@ class Smarty
         $this->_compile_id = $compile_id;
         $this->_inclusion_depth = 0;
 
-        if ($this->caching) {
-            // save old cache_info, initialize cache_info
-            array_push($_cache_info, $this->_cache_info);
-            $this->_cache_info = array();
-            $_params = array(
-                'tpl_file' => $resource_name,
-                'cache_id' => $cache_id,
-                'compile_id' => $compile_id,
-                'results' => null
-            );
-            require_once(SMARTY_CORE_DIR . 'core.read_cache_file.php');
-            if (smarty_core_read_cache_file($_params, $this)) {
-                $_smarty_results = $_params['results'];
-                if (!empty($this->_cache_info['insert_tags'])) {
-                    $_params = array('plugins' => $this->_cache_info['insert_tags']);
-                    require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-                    smarty_core_load_plugins($_params, $this);
-                    $_params = array('results' => $_smarty_results);
-                    require_once(SMARTY_CORE_DIR . 'core.process_cached_inserts.php');
-                    $_smarty_results = smarty_core_process_cached_inserts($_params, $this);
-                }
-                if (!empty($this->_cache_info['cache_serials'])) {
-                    $_params = array('results' => $_smarty_results);
-                    require_once(SMARTY_CORE_DIR . 'core.process_compiled_include.php');
-                    $_smarty_results = smarty_core_process_compiled_include($_params, $this);
-                }
-
-
-                if ($display) {
-                    if ($this->debugging)
-                    {
-                        // capture time for debugging info
-                        $_params = array();
-                        $this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = microtime(true) - $_debug_start_time;
-
-                    }
-
-                echo $_smarty_results;
-
-                    error_reporting($_smarty_old_error_level);
-                    // restore initial cache_info
-                    $this->_cache_info = array_pop($_cache_info);
-                    return true;
-                } else {
-                    error_reporting($_smarty_old_error_level);
-                    // restore initial cache_info
-                    $this->_cache_info = array_pop($_cache_info);
-                    return $_smarty_results;
-                }
-            } else {
-                $this->_cache_info['template'][$resource_name] = true;
-            }
-        }
-
         // load filters that are marked as autoload
         if (count($this->autoload_filters)) {
             foreach ($this->autoload_filters as $_filter_type => $_filters) {
@@ -1051,9 +887,7 @@ class Smarty
 
         // if we just need to display the results, don't perform output
         // buffering - for speed
-        $_cache_including = $this->_cache_including;
-        $this->_cache_including = false;
-        if ($display && !$this->caching && count($this->_plugins['outputfilter']) == 0) {
+        if ($display && count($this->_plugins['outputfilter']) == 0) {
             if ($this->_is_compiled($resource_name, $_smarty_compile_path)
                     || $this->_compile_resource($resource_name, $_smarty_compile_path))
             {
@@ -1073,27 +907,6 @@ class Smarty
                 $_smarty_results = call_user_func_array($_output_filter[0], array($_smarty_results, &$this));
             }
         }
-
-        if ($this->caching) {
-            $_params = array('tpl_file' => $resource_name,
-                        'cache_id' => $cache_id,
-                        'compile_id' => $compile_id,
-                        'results' => $_smarty_results);
-            require_once(SMARTY_CORE_DIR . 'core.write_cache_file.php');
-            smarty_core_write_cache_file($_params, $this);
-            require_once(SMARTY_CORE_DIR . 'core.process_cached_inserts.php');
-            $_smarty_results = smarty_core_process_cached_inserts($_params, $this);
-
-            if ($this->_cache_serials) {
-                // strip nocache-tags from output
-                $_smarty_results = preg_replace('!(\{/?nocache\:[0-9a-f]{32}#\d+\})!s'
-                                                ,''
-                                                ,$_smarty_results);
-            }
-            // restore initial cache_info
-            $this->_cache_info = array_pop($_cache_info);
-        }
-        $this->_cache_including = $_cache_including;
 
         if ($display) {
             if (isset($_smarty_results)) { echo $_smarty_results; }
@@ -1205,14 +1018,8 @@ class Smarty
         }
 
         $_source_content = $_params['source_content'];
-        $_cache_include    = substr($compile_path, 0, -4).'.inc';
 
-        if ($this->_compile_source($resource_name, $_source_content, $_compiled_content, $_cache_include)) {
-            // if a _cache_serial was set, we also have to write an include-file:
-            if ($this->_cache_include_info) {
-                require_once(SMARTY_CORE_DIR . 'core.write_compiled_include.php');
-                smarty_core_write_compiled_include(array_merge($this->_cache_include_info, array('compiled_content'=>$_compiled_content, 'resource_name'=>$resource_name)),  $this);
-            }
+        if ($this->_compile_source($resource_name, $_source_content, $_compiled_content)) {
 
             $_params = array('compile_path'=>$compile_path, 'compiled_content' => $_compiled_content);
             require_once(SMARTY_CORE_DIR . 'core.write_compiled_resource.php');
@@ -1233,7 +1040,7 @@ class Smarty
      * @param string $compiled_content
      * @return boolean
      */
-    function _compile_source($resource_name, &$source_content, &$compiled_content, $cache_include_path=null)
+    function _compile_source($resource_name, &$source_content, &$compiled_content)
     {
 
         $smarty_compiler = new $this->compiler_class;
@@ -1243,7 +1050,6 @@ class Smarty
         $smarty_compiler->plugins_dir       = $this->plugins_dir;
 
         $smarty_compiler->force_compile     = $this->force_compile;
-        $smarty_compiler->caching           = $this->caching;
         $smarty_compiler->php_handling      = $this->php_handling;
         $smarty_compiler->left_delimiter    = $this->left_delimiter;
         $smarty_compiler->right_delimiter   = $this->right_delimiter;
@@ -1260,24 +1066,7 @@ class Smarty
         $smarty_compiler->compile_id        = $this->_compile_id;
         $smarty_compiler->_config            = $this->_config;
 
-        if (isset($cache_include_path) && isset($this->_cache_serials[$cache_include_path])) {
-            $smarty_compiler->_cache_serial = $this->_cache_serials[$cache_include_path];
-        }
-        $smarty_compiler->_cache_include = $cache_include_path;
-
-
         $_results = $smarty_compiler->_compile_file($resource_name, $source_content, $compiled_content);
-
-        if ($smarty_compiler->_cache_serial) {
-            $this->_cache_include_info = array(
-                'cache_serial'=>$smarty_compiler->_cache_serial
-                ,'plugins_code'=>$smarty_compiler->_plugins_code
-                ,'include_file_path' => $cache_include_path);
-
-        } else {
-            $this->_cache_include_info = null;
-
-        }
 
         return $_results;
     }
@@ -1542,19 +1331,10 @@ class Smarty
     }
 
     /**
-     * returns an auto_id for auto-file-functions
-     *
-     * @param string $cache_id
-     * @param string $compile_id
-     * @return string|null
+     * {@deprecated}
      */
-    function _get_auto_id($cache_id=null, $compile_id=null) {
-    if (isset($cache_id))
-        return (isset($compile_id)) ? $cache_id . '|' . $compile_id  : $cache_id;
-    elseif(isset($compile_id))
-        return $compile_id;
-    else
-        return null;
+    function _get_auto_id() {
+            return null;
     }
 
     /**
@@ -1582,30 +1362,12 @@ class Smarty
         }
     }
 
-
-    /**
-     * callback function for preg_replace, to call a non-cacheable block
-     * @return string
-     */
-    function _process_compiled_include_callback($match) {
-        $_func = '_smarty_tplfunc_'.$match[2].'_'.$match[3];
-        ob_start();
-        $_func($this);
-        $_ret = ob_get_contents();
-        ob_end_clean();
-        return $_ret;
-    }
-
-
     /**
      * called for included templates
      *
      * @param string $_smarty_include_tpl_file
      * @param string $_smarty_include_vars
      */
-
-    // $_smarty_include_tpl_file, $_smarty_include_vars
-
     function _smarty_include($params)
     {
         if ($this->debugging) {
@@ -1636,36 +1398,16 @@ class Smarty
             $this->_smarty_debug_info[$included_tpls_idx]['exec_time'] =
             microtime(true) - $debug_start_time;
         }
-
-        if ($this->caching) {
-            $this->_cache_info['template'][$params['smarty_include_tpl_file']] = true;
-        }
     }
-
 
     /**
-     * get or set an array of cached attributes for function that is
-     * not cacheable
-     * @return array
+     * {@deprecated}
      */
-    function &_smarty_cache_attrs($cache_serial, $count) {
-        $_cache_attrs =& $this->_cache_info['cache_attrs'][$cache_serial][$count];
-
-        if ($this->_cache_including) {
-            /* return next set of cache_attrs */
-            $_return = current($_cache_attrs);
-            next($_cache_attrs);
-            return $_return;
-
-        } else {
-            /* add a reference to a new set of cache_attrs */
-            $_cache_attrs[] = array();
-            return $_cache_attrs[count($_cache_attrs)-1];
-
-        }
-
+    function &_smarty_cache_attrs()
+    {
+            static $dummy = [];
+            return $dummy;
     }
-
 
     /**
      * wrapper for include() retaining $this

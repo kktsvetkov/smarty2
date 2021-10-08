@@ -37,11 +37,6 @@ class Smarty_Compiler extends Smarty {
     var $_obj_start_regexp      =   null;
     var $_obj_params_regexp     =   null;
     var $_obj_call_regexp       =   null;
-    var $_cacheable_state       =   0;
-    var $_cache_attrs_count     =   0;
-    var $_nocache_count         =   0;
-    var $_cache_serial          =   null;
-    var $_cache_include         =   null;
 
     var $_strip_depth           =   0;
     var $_additional_newline    =   "\n";
@@ -345,10 +340,6 @@ class Smarty_Compiler extends Smarty {
             $compiled_content = substr($compiled_content, 0, -1);
         }
 
-        if (!empty($this->_cache_serial)) {
-            $compiled_content = "<?php \$this->_cache_serials['".$this->_cache_include."'] = '".$this->_cache_serial."'; ?>" . $compiled_content;
-        }
-
         // run compiled template through postfilter functions
         if (count($this->_plugins['postfilter']) > 0) {
             foreach ($this->_plugins['postfilter'] as $filter_name => $postfilter) {
@@ -610,9 +601,7 @@ class Smarty_Compiler extends Smarty {
             if ($have_function) {
                 $output = call_user_func_array($plugin_func, array($tag_args, &$this));
                 if($output != '') {
-                $output = '<?php ' . $this->_push_cacheable_state('compiler', $tag_command)
-                                   . $output
-                                   . $this->_pop_cacheable_state('compiler', $tag_command) . ' ?>';
+                $output = '<?php ' . $output . ' ?>';
                 }
             } else {
                 $this->_syntax_error($message, E_USER_WARNING, __FILE__, __LINE__);
@@ -696,11 +685,11 @@ class Smarty_Compiler extends Smarty {
             $this->_pop_tag($tag_command);
 
         if ($start_tag) {
-            $output = '<?php ' . $this->_push_cacheable_state('block', $tag_command);
+            $output = '<?php /* strip */ ';
             $attrs = $this->_parse_attrs($tag_args);
-            $_cache_attrs='';
-            $arg_list = $this->_compile_arg_list('block', $tag_command, $attrs, $_cache_attrs);
-            $output .= "$_cache_attrs\$this->_tag_stack[] = array('$tag_command', array(".implode(',', $arg_list).')); ';
+
+            $arg_list = $this->_compile_arg_list('block', $tag_command, $attrs, '');
+            $output .= "\$this->_tag_stack[] = array('$tag_command', array(".implode(',', $arg_list).')); ';
             $output .= '$_block_repeat=true;' . $this->_compile_plugin_call('block', $tag_command).'($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);';
             $output .= 'while ($_block_repeat) { ob_start(); ?>';
         } else {
@@ -710,7 +699,7 @@ class Smarty_Compiler extends Smarty {
                 $this->_parse_modifiers($_out_tag_text, $tag_modifier);
             }
             $output .= '$_block_repeat=false;echo ' . $_out_tag_text . '; } ';
-            $output .= " array_pop(\$this->_tag_stack); " . $this->_pop_cacheable_state('block', $tag_command) . '?>';
+            $output .= " array_pop(\$this->_tag_stack); " . '?>';
         }
 
         return true;
@@ -777,10 +766,8 @@ class Smarty_Compiler extends Smarty {
            we compile right now */
         $this->_add_plugin('function', $tag_command);
 
-        $_cacheable_state = $this->_push_cacheable_state('function', $tag_command);
         $attrs = $this->_parse_attrs($tag_args);
-        $_cache_attrs = '';
-        $arg_list = $this->_compile_arg_list('function', $tag_command, $attrs, $_cache_attrs);
+        $arg_list = $this->_compile_arg_list('function', $tag_command, $attrs);
 
         $output = $this->_compile_plugin_call('function', $tag_command).'(array('.implode(',', $arg_list)."), \$this)";
         if($tag_modifier != '') {
@@ -788,8 +775,7 @@ class Smarty_Compiler extends Smarty {
         }
 
         if($output != '') {
-            $output =  '<?php ' . $_cacheable_state . $_cache_attrs . 'echo ' . $output . ';'
-                . $this->_pop_cacheable_state('function', $tag_command) . "?>" . $this->_additional_newline;
+            $output =  '<?php ' . 'echo ' . $output . ';' . "?>" . $this->_additional_newline;
         }
 
         return true;
@@ -1384,35 +1370,15 @@ class Smarty_Compiler extends Smarty {
     }
 
 
-    function _compile_arg_list($type, $name, $attrs, &$cache_code) {
+    function _compile_arg_list($type, $name, $attrs) {
         $arg_list = array();
-
-        if (isset($type) && isset($name)
-            && isset($this->_plugins[$type])
-            && isset($this->_plugins[$type][$name])
-            && empty($this->_plugins[$type][$name][4])
-            && is_array($this->_plugins[$type][$name][5])
-            ) {
-            /* we have a list of parameters that should be cached */
-            $_cache_attrs = $this->_plugins[$type][$name][5];
-            $_count = $this->_cache_attrs_count++;
-            $cache_code = "\$_cache_attrs =& \$this->_smarty_cache_attrs('$this->_cache_serial','$_count');";
-
-        } else {
-            /* no parameters are cached */
-            $_cache_attrs = null;
-        }
 
         foreach ($attrs as $arg_name => $arg_value) {
             if (is_bool($arg_value))
                 $arg_value = $arg_value ? 'true' : 'false';
             if (is_null($arg_value))
                 $arg_value = 'null';
-            if ($_cache_attrs && in_array($arg_name, $_cache_attrs)) {
-                $arg_list[] = "'$arg_name' => (\$this->_cache_including) ? \$_cache_attrs['$arg_name'] : (\$_cache_attrs['$arg_name']=$arg_value)";
-            } else {
-                $arg_list[] = "'$arg_name' => $arg_value";
-            }
+           $arg_list[] = "'$arg_name' => $arg_value";
         }
         return $arg_list;
     }
@@ -2218,39 +2184,21 @@ class Smarty_Compiler extends Smarty {
     }
 
 
-    /**
-     * check if the compilation changes from cacheable to
-     * non-cacheable state with the beginning of the current
-     * plugin. return php-code to reflect the transition.
-     * @return string
-     */
-    function _push_cacheable_state($type, $name) {
-        $_cacheable = !isset($this->_plugins[$type][$name]) || $this->_plugins[$type][$name][4];
-        if ($_cacheable
-            || 0<$this->_cacheable_state++) return '';
-        if (!isset($this->_cache_serial)) $this->_cache_serial = md5(uniqid('Smarty'));
-        $_ret = 'if ($this->caching && !$this->_cache_including): echo \'{nocache:'
-            . $this->_cache_serial . '#' . $this->_nocache_count
-            . '}\'; endif;';
-        return $_ret;
-    }
+        /**
+        * {@deprecated}
+        */
+        function _push_cacheable_state()
+        {
+                return '';
+        }
 
-
-    /**
-     * check if the compilation changes from non-cacheable to
-     * cacheable state with the end of the current plugin return
-     * php-code to reflect the transition.
-     * @return string
-     */
-    function _pop_cacheable_state($type, $name) {
-        $_cacheable = !isset($this->_plugins[$type][$name]) || $this->_plugins[$type][$name][4];
-        if ($_cacheable
-            || --$this->_cacheable_state>0) return '';
-        return 'if ($this->caching && !$this->_cache_including): echo \'{/nocache:'
-            . $this->_cache_serial . '#' . ($this->_nocache_count++)
-            . '}\'; endif;';
-    }
-
+        /**
+        * {@deprecated}
+        */
+        function _pop_cacheable_state()
+        {
+                return '';
+        }
 
     /**
      * push opening tag-name, file-name and line-number on the tag-stack
