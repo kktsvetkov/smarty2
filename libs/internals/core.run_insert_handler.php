@@ -33,8 +33,8 @@ function smarty_core_run_insert_handler($params, &$smarty)
     } else {
         if (isset($params['args']['script'])) {
             $_params = array('resource_name' => $smarty->_dequote($params['args']['script']));
-            require_once(SMARTY_CORE_DIR . 'core.get_php_resource.php');
-            if(!smarty_core_get_php_resource($_params, $smarty)) {
+
+            if(!Smarty_Core::get_php_resource($_params, $smarty)) {
                 return false;
             }
 
