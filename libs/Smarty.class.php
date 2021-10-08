@@ -87,14 +87,6 @@ class Smarty
     var $error_reporting  =  null;
 
     /**
-     * This is the path to the debug console template. If not set,
-     * the default one will be used.
-     *
-     * @var string
-     */
-    var $debug_tpl       =  '';
-
-    /**
      * This tells Smarty whether to check for recompiling or not. Recompiling
      * does not need to happen unless a template or config file is changed.
      * Typically you enable this during development, and disable for
@@ -1137,8 +1129,7 @@ class Smarty
                         // capture time for debugging info
                         $_params = array();
                         $this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = microtime(true) - $_debug_start_time;
-                        require_once(SMARTY_CORE_DIR . 'core.display_debug_console.php');
-                        $_smarty_results .= smarty_core_display_debug_console($_params, $this);
+
                     }
                     if ($this->cache_modified_check) {
                         $_server_vars = ($this->request_use_auto_globals) ? $_SERVER : $GLOBALS['HTTP_SERVER_VARS'];
@@ -1240,8 +1231,7 @@ class Smarty
                 // capture time for debugging info
                 $_params = array();
                 $this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = (microtime(true) - $_debug_start_time);
-                require_once(SMARTY_CORE_DIR . 'core.display_debug_console.php');
-                echo smarty_core_display_debug_console($_params, $this);
+
             }
             error_reporting($_smarty_old_error_level);
             return;
