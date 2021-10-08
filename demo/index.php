@@ -1,8 +1,11 @@
 <?php
 
-require '../libs/Smarty.class.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $smarty = new Smarty;
+
+$smarty->template_dir = __DIR__ . '/templates';
+$smarty->compile_dir = __DIR__ . '/templates_c';
 
 $smarty->compile_check = true;
 $smarty->debugging = true;
@@ -21,5 +24,3 @@ $smarty->assign("option_output", array("New York","Nebraska","Kansas","Iowa","Ok
 $smarty->assign("option_selected", "NE");
 
 $smarty->display('index.tpl');
-
-?>
