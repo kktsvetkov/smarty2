@@ -188,25 +188,6 @@ class Smarty
     var $right_delimiter =  '}';
 
     /**
-     * The order in which request variables are registered, similar to
-     * variables_order in php.ini E = Environment, G = GET, P = POST,
-     * C = Cookies, S = Server
-     *
-     * @var string
-     */
-    var $request_vars_order    = 'EGPCS';
-
-    /**
-     * Indicates wether $HTTP_*_VARS[] (request_use_auto_globals=false)
-     * are uses as request-vars or $_*[]-vars. note: if
-     * request_use_auto_globals is true, then $request_vars_order has
-     * no effect, but the php-ini-value "gpc_order"
-     *
-     * @var boolean
-     */
-    var $request_use_auto_globals      = true;
-
-    /**
      * Set this if you want different sets of compiled files for the same
      * templates. This is useful for things like different languages.
      * Instead of creating separate sets of templates per language, you
@@ -1064,7 +1045,7 @@ class Smarty
 
                     }
                     if ($this->cache_modified_check) {
-                        $_server_vars = ($this->request_use_auto_globals) ? $_SERVER : $GLOBALS['HTTP_SERVER_VARS'];
+                        $_server_vars =  $_SERVER ;
                         $_last_modified_date = @substr($_server_vars['HTTP_IF_MODIFIED_SINCE'], 0, strpos($_server_vars['HTTP_IF_MODIFIED_SINCE'], 'GMT') + 3);
                         $_gmt_mtime = gmdate('D, d M Y H:i:s', $this->_cache_info['timestamp']).' GMT';
                         if (@count($this->_cache_info['insert_tags']) == 0
@@ -1321,7 +1302,6 @@ class Smarty
         $smarty_compiler->default_modifiers = $this->default_modifiers;
         $smarty_compiler->compile_id        = $this->_compile_id;
         $smarty_compiler->_config            = $this->_config;
-        $smarty_compiler->request_use_auto_globals  = $this->request_use_auto_globals;
 
         if (isset($cache_include_path) && isset($this->_cache_serials[$cache_include_path])) {
             $smarty_compiler->_cache_serial = $this->_cache_serials[$cache_include_path];

@@ -15,7 +15,7 @@ class Smarty_Compiler extends Smarty {
     var $_current_line_no       =   1;          // line number for error messages
     var $_capture_stack         =   array();    // keeps track of nested capture buffers
     var $_plugin_info           =   array();    // keeps track of plugins to load
-    var $_init_smarty_vars      =   false;
+
     var $_permitted_tokens      =   array('true','false','yes','no','on','off','null');
     var $_db_qstr_regexp        =   null;        // regexps are setup in the constructor
     var $_si_qstr_regexp        =   null;
@@ -382,11 +382,6 @@ class Smarty_Compiler extends Smarty {
             $template_header .= $plugins_code;
             $this->_plugin_info = array();
             $this->_plugins_code = $plugins_code;
-        }
-
-        if ($this->_init_smarty_vars) {
-            $template_header .= "<?php require_once(SMARTY_CORE_DIR . 'core.assign_smarty_interface.php');\nsmarty_core_assign_smarty_interface(null, \$this); ?>\n";
-            $this->_init_smarty_vars = false;
         }
 
         $compiled_content = $template_header . $compiled_content;
@@ -2079,12 +2074,9 @@ class Smarty_Compiler extends Smarty {
                                          E_USER_WARNING, __FILE__, __LINE__);
                     return;
                 }
-                if ($this->request_use_auto_globals) {
                     $compiled_ref = "\$_REQUEST";
                     break;
-                } else {
-                    $this->_init_smarty_vars = true;
-                }
+
                 return null;
 
             case 'capture':
