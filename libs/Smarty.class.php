@@ -425,13 +425,13 @@ class Smarty
      */
     var $_filepaths_cache = array();
     /**#@-*/
+
     /**
      * The class constructor.
      */
     public function __construct()
     {
-      $this->assign('SCRIPT_NAME', isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME']
-                    : @$GLOBALS['HTTP_SERVER_VARS']['SCRIPT_NAME']);
+      $this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME']) ?? null);
     }
 
     /**
@@ -1759,24 +1759,22 @@ class Smarty
         return eval($code);
     }
 
-    /**
-     * Extracts the filter name from the given callback
-     *
-     * @param callback $function
-     * @return string
-     */
-	function _get_filter_name($function)
-	{
-		if (is_array($function)) {
-			$_class_name = (is_object($function[0]) ?
-				get_class($function[0]) : $function[0]);
-			return $_class_name . '_' . $function[1];
-		}
-		else {
-			return $function;
-		}
-	}
+        /**
+        * Extracts the filter name from the given callback
+        *
+        * @param callback $function
+        * @return string
+        */
+        protected function _get_filter_name(string $function) : string 
+        {
+                if (is_array($function))
+                {
+                        $_class_name = (is_object($function[0]))
+                                ? get_class($function[0])
+                                : $function[0] ;
+                        return $_class_name . '_' . $function[1];
+                }
 
-    /**#@-*/
-
+                return $function;
+        }
 }
