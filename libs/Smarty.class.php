@@ -674,8 +674,7 @@ class Smarty
         switch ($type) {
             case 'output':
                 $_params = array('plugins' => array(array($type . 'filter', $name, null, null, false)));
-                require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-                smarty_core_load_plugins($_params, $this);
+                Smarty_Core::load_plugins($_params, $this);
                 break;
 
             case 'pre':

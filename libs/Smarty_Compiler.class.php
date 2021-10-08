@@ -369,7 +369,7 @@ class Smarty_Compiler extends Smarty {
                 }
             }
             $_plugins_params .= '))';
-            $plugins_code = "<?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');\nsmarty_core_load_plugins($_plugins_params, \$this); ?>\n";
+            $plugins_code = "<?php Smarty_Core::load_plugins({$_plugins_params}, \$this); ?>\n";
             $template_header .= $plugins_code;
             $this->_plugin_info = array();
             $this->_plugins_code = $plugins_code;
@@ -2141,8 +2141,7 @@ class Smarty_Compiler extends Smarty {
                 if ($prefilter === false) {
                     unset($this->_plugins['prefilter'][$filter_name]);
                     $_params = array('plugins' => array(array('prefilter', $filter_name, null, null, false)));
-                    require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-                    smarty_core_load_plugins($_params, $this);
+                    Smarty_Core::load_plugins($_params, $this);
                 }
             }
         }
@@ -2151,8 +2150,7 @@ class Smarty_Compiler extends Smarty {
                 if ($postfilter === false) {
                     unset($this->_plugins['postfilter'][$filter_name]);
                     $_params = array('plugins' => array(array('postfilter', $filter_name, null, null, false)));
-                    require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-                    smarty_core_load_plugins($_params, $this);
+                    Smarty_Core::oad_plugins($_params, $this);
                 }
             }
         }
