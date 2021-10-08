@@ -18,7 +18,7 @@
 function smarty_core_get_php_resource(&$params, &$smarty)
 {
 
-    $params['resource_base_path'] = $smarty->trusted_dir;
+    $params['resource_base_path'] = array();
     $smarty->_parse_resource_name($params, $smarty);
 
     /*
@@ -54,15 +54,7 @@ function smarty_core_get_php_resource(&$params, &$smarty)
         $_error_funcc = 'trigger_error';
     }
 
-    if ($_readable) {
-        if ($smarty->security) {
-            require_once(SMARTY_CORE_DIR . 'core.is_trusted.php');
-            if (!smarty_core_is_trusted($params, $smarty)) {
-                $smarty->$_error_funcc('(secure mode) ' . $params['resource_type'] . ':' . $params['resource_name'] . ' is not trusted');
-                return false;
-            }
-        }
-    } else {
+    if (!$_readable) {
         $smarty->$_error_funcc($params['resource_type'] . ':' . $params['resource_name'] . ' is not readable');
         return false;
     }
@@ -74,7 +66,3 @@ function smarty_core_get_php_resource(&$params, &$smarty)
     }
     return true;
 }
-
-/* vim: set expandtab: */
-
-?>

@@ -1,13 +1,6 @@
 <?php
 
 /**
- * DIR_SEP isn't used anymore, but third party apps might
- */
-if(!defined('DIR_SEP')) {
-    define('DIR_SEP', DIRECTORY_SEPARATOR);
-}
-
-/**
  * set SMARTY_DIR to absolute path to Smarty library files.
  * if not defined, include_path will be used. Sets SMARTY_DIR only if user
  * application has not already defined it.
@@ -195,14 +188,6 @@ class Smarty
                                     'ALLOW_CONSTANTS'  => false,
                                     'ALLOW_SUPER_GLOBALS' => true
                                    );
-
-    /**
-     * This is an array of directories where trusted php scripts reside.
-     * {@link $security} is disabled during their inclusion/execution.
-     *
-     * @var array
-     */
-    var $trusted_dir        = array();
 
     /**
      * The left delimiter used for the template tags.
@@ -1395,7 +1380,7 @@ class Smarty
         $smarty_compiler->security          = $this->security;
         $smarty_compiler->secure_dir        = $this->secure_dir;
         $smarty_compiler->security_settings = $this->security_settings;
-        $smarty_compiler->trusted_dir       = $this->trusted_dir;
+
         $smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
         $smarty_compiler->_reg_objects      = &$this->_reg_objects;
         $smarty_compiler->_plugins          = &$this->_plugins;
@@ -1880,7 +1865,3 @@ class Smarty
     /**#@-*/
 
 }
-
-/* vim: set expandtab: */
-
-?>
