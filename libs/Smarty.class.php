@@ -159,7 +159,7 @@ class Smarty
     var $compile_id            = null;
 
     /**
-     * This tells Smarty whether or not to use sub dirs in the cache/ and
+     * This tells Smarty whether or not to use sub dirs in the
      * templates_c/ directories. sub directories better organized, but
      * may not work well with PHP safe mode enabled.
      *
@@ -523,10 +523,10 @@ class Smarty
      * @param string $function name of template function
      * @param string $function_impl name of PHP function to register
      */
-    function register_compiler_function($function, $function_impl, $cacheable=true)
+    function register_compiler_function($function, $function_impl)
     {
         $this->_plugins['compiler'][$function] =
-            array($function_impl, null, null, false, $cacheable);
+            array($function_impl, null, null, false);
     }
 
     /**

@@ -79,6 +79,15 @@ Array
 The config file reading is removed. In order to introduce config_vars use
 the `Smarty::set_config_vars()` method instead.
 
+## Caching
+
+The built-in caching of the Smarty 2 project is removed from this fork. The
+methods used in caching are still present, but they are considered deprecated
+and do nothing.
+
+Consider other options for caching for your web app, not within the
+presentation layer that Smarty provides.
+
 ## From Original README
 
 **What is Smarty?**
