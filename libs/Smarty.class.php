@@ -221,13 +221,6 @@ class Smarty
     var $default_resource_type    = 'file';
 
     /**
-     * The function used for cache file handling. If not set, built-in caching is used.
-     *
-     * @var null|string function name
-     */
-    var $cache_handler_func   = null;
-
-    /**
      * This indicates which filters are automatically loaded into Smarty.
      *
      * @var array array of filter names
@@ -778,19 +771,12 @@ class Smarty
             $compile_id = null;
 
         $_auto_id = $this->_get_auto_id($cache_id, $compile_id);
-
-        if (!empty($this->cache_handler_func)) {
-            return call_user_func_array($this->cache_handler_func,
-                                  array('clear', &$this, &$dummy, $tpl_file, $cache_id, $compile_id, $exp_time));
-        } else {
-            $_params = array('auto_base' => $this->cache_dir,
+        $_params = array('auto_base' => $this->cache_dir,
                             'auto_source' => $tpl_file,
                             'auto_id' => $_auto_id,
                             'exp_time' => $exp_time);
             require_once(SMARTY_CORE_DIR . 'core.rm_auto.php');
             return smarty_core_rm_auto($_params, $this);
-        }
-
     }
 
 

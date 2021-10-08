@@ -65,13 +65,6 @@ function smarty_core_write_cache_file($params, &$smarty)
     $_cache_info = serialize($smarty->_cache_info);
     $params['results'] = strlen($_cache_info) . "\n" . $_cache_info . $params['results'];
 
-    if (!empty($smarty->cache_handler_func)) {
-        // use cache_handler function
-        call_user_func_array($smarty->cache_handler_func,
-                             array('write', &$smarty, &$params['results'], $params['tpl_file'], $params['cache_id'], $params['compile_id'], $smarty->_cache_info['expires']));
-    } else {
-        // use local cache file
-
         if(!@is_writable($smarty->cache_dir)) {
             // cache_dir not writable, see if it exists
             if(!@is_dir($smarty->cache_dir)) {
@@ -88,5 +81,5 @@ function smarty_core_write_cache_file($params, &$smarty)
 
         Smarty_Core::write_file($_params, $smarty);
         return true;
-    }
+
 }
