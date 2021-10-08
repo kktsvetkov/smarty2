@@ -77,17 +77,6 @@ function smarty_core_read_cache_file(&$params, &$smarty)
                 return false;
             }
         }
-
-        if (isset($_cache_info['config'])) {
-            $_params = array('resource_base_path' => $smarty->config_dir, 'get_source' => false, 'quiet'=>true);
-            foreach (array_keys($_cache_info['config']) as $_config_dep) {
-                $_params['resource_name'] = $_config_dep;
-                if (!$smarty->_fetch_resource_info($_params) || $_cache_info['timestamp'] < $_params['resource_timestamp']) {
-                    // config file has changed, regenerate cache
-                    return false;
-                }
-            }
-        }
     }
 
     $content_cache[$params['tpl_file'].','.$params['cache_id'].','.$params['compile_id']] = array($params['results'], $_cache_info);
@@ -95,7 +84,3 @@ function smarty_core_read_cache_file(&$params, &$smarty)
     $smarty->_cache_info = $_cache_info;
     return true;
 }
-
-/* vim: set expandtab: */
-
-?>

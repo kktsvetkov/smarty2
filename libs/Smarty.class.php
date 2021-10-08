@@ -50,13 +50,6 @@ class Smarty
     var $compile_dir     =  'templates_c';
 
     /**
-     * The directory where config files are located.
-     *
-     * @var string
-     */
-    var $config_dir      =  'configs';
-
-    /**
      * An array of directories searched for plugins.
      *
      * @var array
@@ -268,37 +261,6 @@ class Smarty
      */
     var $autoload_filters = array();
 
-    /**#@+
-     * @var boolean
-     */
-    /**
-     * This tells if config file vars of the same name overwrite each other or not.
-     * if disabled, same name variables are accumulated in an array.
-     */
-    var $config_overwrite = true;
-
-    /**
-     * This tells whether or not to automatically booleanize config file variables.
-     * If enabled, then the strings "on", "true", and "yes" are treated as boolean
-     * true, and "off", "false" and "no" are treated as boolean false.
-     */
-    var $config_booleanize = true;
-
-    /**
-     * This tells whether hidden sections [.foobar] are readable from the
-     * tempalates or not. Normally you would never allow this since that is
-     * the point behind hidden sections: the application can access them, but
-     * the templates cannot.
-     */
-    var $config_read_hidden = false;
-
-    /**
-     * This tells whether or not automatically fix newlines in config files.
-     * It basically converts \r (mac) or \r\n (dos) to \n
-     */
-    var $config_fix_newlines = true;
-    /**#@-*/
-
     /**
      * If a template cannot be found, this PHP function will be executed.
      * Useful for creating templates on-the-fly or other special action.
@@ -313,13 +275,6 @@ class Smarty
      * @var string
      */
     var $compiler_class        =   'Smarty_Compiler';
-
-    /**
-     * The class used to load config vars.
-     *
-     * @var string
-     */
-    var $config_class          =   'Config_File';
 
 /**#@+
  * END Smarty Configuration Section
@@ -362,18 +317,11 @@ class Smarty
     var $_tag_stack            = array();
 
     /**
-     * configuration object
-     *
-     * @var Config_file
-     */
-    var $_conf_obj             = null;
-
-    /**
      * loaded configuration settings
      *
      * @var array
      */
-    var $_config               = array(array('vars'  => array(), 'files' => array()));
+    var $_config = array();
 
     /**
      * md5 checksum of the string 'Smarty'
@@ -980,21 +928,44 @@ class Smarty
      * Returns an array containing config variables
      *
      * @param string $name
-     * @param string $type
      * @return array
      */
-    function &get_config_vars($name=null)
+    function get_config_vars($name=null)
     {
-        if(!isset($name) && is_array($this->_config[0])) {
-            return $this->_config[0]['vars'];
-        } else if(isset($this->_config[0]['vars'][$name])) {
-            return $this->_config[0]['vars'][$name];
-        } else {
-            // var non-existant, return valid reference
-            $_tmp = null;
-            return $_tmp;
-        }
+            if (null === $name)
+            {
+                    return $this->_config;
+            }
+
+            return $this->_config[$name] ?? [];
     }
+
+        /**
+        * Introduces values as config vars
+        *
+        * @param array|string $name the config var name
+        * @param mixed $value the value to assign
+        * @return self
+        */
+        function set_config_vars($name, $value = null)
+        {
+                if (is_array($name))
+                {
+                        foreach ($name as $key => $val)
+                        {
+                                if ($key != '')
+                                {
+                                        $this->_config[$key] = $val;
+                                }
+                        }
+                } else
+                if ($name != '')
+                {
+                        $this->_config[$name] = $value;
+                }
+
+                return $this;
+        }
 
     /**
      * trigger Smarty error
@@ -1201,19 +1172,6 @@ class Smarty
     }
 
     /**
-     * load configuration values
-     *
-     * @param string $file
-     * @param string $section
-     * @param string $scope
-     */
-    function config_load($file, $section = null, $scope = 'global')
-    {
-        require_once($this->_get_plugin_filepath('function', 'config_load'));
-        smarty_function_config_load(array('file' => $file, 'section' => $section, 'scope' => $scope), $this);
-    }
-
-    /**
      * return a reference to a registered object
      *
      * @param string $name
@@ -1236,12 +1194,12 @@ class Smarty
      */
     function clear_config($var = null)
     {
-        if(!isset($var)) {
+        if(null === $var)
+        {
             // clear all values
-            $this->_config = array(array('vars'  => array(),
-                                         'files' => array()));
+            $this->_config = array();
         } else {
-            unset($this->_config[0]['vars'][$var]);
+            unset($this->_config[$var]);
         }
     }
 
@@ -1344,7 +1302,7 @@ class Smarty
         $smarty_compiler->template_dir      = $this->template_dir;
         $smarty_compiler->compile_dir       = $this->compile_dir;
         $smarty_compiler->plugins_dir       = $this->plugins_dir;
-        $smarty_compiler->config_dir        = $this->config_dir;
+
         $smarty_compiler->force_compile     = $this->force_compile;
         $smarty_compiler->caching           = $this->caching;
         $smarty_compiler->php_handling      = $this->php_handling;
@@ -1731,21 +1689,13 @@ class Smarty
 
         $this->_tpl_vars = array_merge($this->_tpl_vars, $params['smarty_include_vars']);
 
-        // config vars are treated as local, so push a copy of the
-        // current ones onto the front of the stack
-        array_unshift($this->_config, $this->_config[0]);
-
         $_smarty_compile_path = $this->_get_compile_path($params['smarty_include_tpl_file']);
-
 
         if ($this->_is_compiled($params['smarty_include_tpl_file'], $_smarty_compile_path)
             || $this->_compile_resource($params['smarty_include_tpl_file'], $_smarty_compile_path))
         {
             include($_smarty_compile_path);
         }
-
-        // pop the local vars off the front of the stack
-        array_shift($this->_config);
 
         $this->_inclusion_depth--;
 

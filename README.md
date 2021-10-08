@@ -74,6 +74,11 @@ Array
 )
 ```
 
+## Config Vars
+
+The config file reading is removed. In order to introduce config_vars use
+the `Smarty::set_config_vars()` method instead.
+
 ## From Original README
 
 **What is Smarty?**

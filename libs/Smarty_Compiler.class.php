@@ -1863,7 +1863,7 @@ class Smarty_Compiler extends Smarty {
 
         $var_name = substr($var_ref, 1, -1);
 
-        $output = "\$this->_config[0]['vars']['$var_name']";
+        $output = "\$this->_config['{$var_name}']";
 
         $this->_parse_modifiers($output, $modifiers);
 
@@ -2145,7 +2145,7 @@ class Smarty_Compiler extends Smarty {
                 break;
 
             case 'config':
-                $compiled_ref = "\$this->_config[0]['vars']";
+                $compiled_ref = "\$this->_config";
                 $_max_index = 3;
                 break;
 
