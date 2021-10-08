@@ -431,7 +431,7 @@ class Smarty
      */
     public function __construct()
     {
-      $this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME']) ?? null);
+      $this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME'] ?? null);
     }
 
     /**
@@ -1476,13 +1476,6 @@ class Smarty
                         $params['resource_name'] = $_fullpath;
                         return true;
                     }
-                    // didn't find the file, try include_path
-                    $_params = array('file_path' => $_fullpath);
-                    require_once(SMARTY_CORE_DIR . 'core.get_include_path.php');
-                    if(smarty_core_get_include_path($_params, $this)) {
-                        $params['resource_name'] = $_params['new_file_path'];
-                        return true;
-                    }
                 }
                 return false;
             } else {
@@ -1765,7 +1758,7 @@ class Smarty
         * @param callback $function
         * @return string
         */
-        protected function _get_filter_name(string $function) : string 
+        protected function _get_filter_name(string $function) : string
         {
                 if (is_array($function))
                 {
