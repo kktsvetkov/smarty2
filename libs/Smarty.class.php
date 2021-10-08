@@ -20,7 +20,7 @@ define('SMARTY_PHP_REMOVE',     2);
 define('SMARTY_PHP_ALLOW',      3);
 
 /**
-* Smarty2 - the PHP template engine 
+* Smarty2 - the PHP template engine
 *
 * @package Smarty2
 */
@@ -1215,8 +1215,7 @@ class Smarty
     function _get_plugin_filepath($type, $name)
     {
         $_params = array('type' => $type, 'name' => $name);
-        require_once(SMARTY_CORE_DIR . 'core.assemble_plugin_filepath.php');
-        return smarty_core_assemble_plugin_filepath($_params, $this);
+        return Smarty_Core::assemble_plugin_filepath($_params, $this);
     }
 
    /**
