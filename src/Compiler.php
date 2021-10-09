@@ -216,7 +216,9 @@ class Compiler extends Engine
         }
 
         /* fetch all special blocks */
-        $search = "~{$ldq}\*(.*?)\*{$rdq}|{$ldq}\s*literal\s*{$rdq}(.*?){$ldq}\s*/literal\s*{$rdq}|{$ldq}\s*php\s*{$rdq}(.*?){$ldq}\s*/php\s*{$rdq}~s";
+        $search = "~{$ldq}\*(.*?)\*{$rdq}"
+                . "|{$ldq}\s*literal\s*{$rdq}(.*?){$ldq}\s*/literal\s*{$rdq}"
+                . "|{$ldq}\s*php\s*{$rdq}(.*?){$ldq}\s*/php\s*{$rdq}~s";
 
         preg_match_all($search, $source_content, $match,  PREG_SET_ORDER);
         $this->_folded_blocks = $match;

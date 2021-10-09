@@ -792,7 +792,6 @@ class Engine
 
         if ($this->debugging) {
             // capture time for debugging info
-            $_params = array();
 
             $_debug_start_time = microtime(true);
             $this->_smarty_debug_info[] = array('type'      => 'template',
@@ -809,7 +808,7 @@ class Engine
         $this->_inclusion_depth = 0;
 
         // load filters that are marked as autoload
-        if (count($this->autoload_filters)) {
+        if (!empty($this->autoload_filters)) {
             foreach ($this->autoload_filters as $_filter_type => $_filters) {
                 foreach ($_filters as $_filter) {
                     $this->load_filter($_filter_type, $_filter);
@@ -846,9 +845,7 @@ class Engine
             if (isset($_smarty_results)) { echo $_smarty_results; }
             if ($this->debugging) {
                 // capture time for debugging info
-                $_params = array();
                 $this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = (microtime(true) - $_debug_start_time);
-
             }
             error_reporting($_smarty_old_error_level);
             return;
@@ -903,38 +900,52 @@ class Engine
         return \Smarty2\Core::assemble_plugin_filepath($_params, $this);
     }
 
-   /**
-     * test if resource needs compiling
-     *
-     * @param string $resource_name
-     * @param string $compile_path
-     * @return boolean
-     */
-    function _is_compiled($resource_name, $compile_path)
-    {
-        if (!$this->force_compile && file_exists($compile_path)) {
-            if (!$this->compile_check) {
+        /**
+        * test if resource needs compiling
+        *
+        * @param string $resource_name
+        * @param string $compile_path
+        * @return boolean
+        */
+        function _is_compiled($resource_name, $compile_path)
+        {
+                /*
+                * note that if the same template is included
+                * multiple times within the same script, it
+                * will be compled multiple times when force_compile
+                * is on
+                */
+                if ($this->force_compile)
+                {
+                        return false;
+                }
+
+                if (!is_file($compile_path))
+                {
+                        return false;
+                }
+
                 // no need to check compiled file
-                return true;
-            } else {
+                if (!$this->compile_check)
+                {
+                        return true;
+                }
+
                 // get file source and timestamp
                 $_params = array('resource_name' => $resource_name, 'get_source'=>false);
-                if (!$this->_fetch_resource_info($_params)) {
-                    return false;
+                if (!$this->_fetch_resource_info($_params))
+                {
+                        return false;
                 }
-                if ($_params['resource_timestamp'] <= filemtime($compile_path)) {
-                    // template not expired, no recompile
-                    return true;
-                } else {
-                    // compile template
-                    return false;
+
+                // template not expired, no recompile
+                if ($_params['resource_timestamp'] <= filemtime($compile_path))
+                {
+                        return true;
                 }
-            }
-        } else {
-            // compiled template does not exist, or forced compile
-            return false;
+
+                return false;
         }
-    }
 
    /**
      * compile the template
