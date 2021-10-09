@@ -1197,7 +1197,8 @@ class Smarty
                 // use the first directory where the file is found
                 foreach ((array)$params['resource_base_path'] as $_curr_path) {
                     $_fullpath = $_curr_path . DIRECTORY_SEPARATOR . $params['resource_name'];
-                    if (file_exists($_fullpath) && is_file($_fullpath)) {
+                    if (is_file($_fullpath))
+                    {
                         $params['resource_name'] = $_fullpath;
                         return true;
                     }
@@ -1205,12 +1206,13 @@ class Smarty
                 return false;
             } else {
                 /* absolute path */
-                return file_exists($params['resource_name']);
+                return is_file($params['resource_name']);
             }
-        } elseif (empty($this->_plugins['resource'][$params['resource_type']])) {
+        } else
+        if (empty($this->_plugins['resource'][$params['resource_type']]))
+        {
             $_params = array('type' => $params['resource_type']);
-            require_once(SMARTY_CORE_DIR . 'core.load_resource_plugin.php');
-            smarty_core_load_resource_plugin($_params, $this);
+            Smarty_core::load_resource_plugin($_params, $this);
         }
 
         return true;
