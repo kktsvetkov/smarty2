@@ -10,10 +10,6 @@ if (!defined('SMARTY_DIR')) {
     define('SMARTY_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 }
 
-if (!defined('SMARTY_CORE_DIR')) {
-    define('SMARTY_CORE_DIR', SMARTY_DIR . 'internals' . DIRECTORY_SEPARATOR);
-}
-
 define('SMARTY_PHP_PASSTHRU',   0);
 define('SMARTY_PHP_QUOTE',      1);
 define('SMARTY_PHP_REMOVE',     2);
