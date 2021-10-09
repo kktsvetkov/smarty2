@@ -23,10 +23,9 @@
                 "php": ">=7.1"
         },
         "autoload": {
-                "classmap": [
-                        "libs/Smarty.class.php",
-                        "libs/Smarty_Compiler.class.php",
-                        "libs/Smarty_Core.class.php"
-                ]
+                "psr-4": {
+                    "Smarty2\\": "src/"
+                },
+                "files": ["autoload-legacy.php"]
         }
 }

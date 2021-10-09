@@ -1,10 +1,13 @@
 <?php
 
+namespace Smarty2;
+
 /**
  * Template compiling class
  * @package Smarty2
  */
-class Smarty_Compiler extends Smarty {
+class Compiler extends Engine
+{
 
     // internal vars
     /**#@+
@@ -369,7 +372,7 @@ class Smarty_Compiler extends Smarty {
                 }
             }
             $_plugins_params .= '))';
-            $plugins_code = "<?php Smarty_Core::load_plugins({$_plugins_params}, \$this); ?>\n";
+            $plugins_code = "<?php \Smarty2\Core::load_plugins({$_plugins_params}, \$this); ?>\n";
             $template_header .= $plugins_code;
             $this->_plugin_info = array();
             $this->_plugins_code = $plugins_code;
@@ -910,7 +913,7 @@ class Smarty_Compiler extends Smarty {
 
         $_params = "array('args' => array(".implode(', ', (array)$arg_list)."))";
 
-        return "<?php echo Smarty_Core::run_insert_handler($_params, \$this); ?>"
+        return "<?php echo \Smarty2\Core::run_insert_handler($_params, \$this); ?>"
                 . $this->_additional_newline;
     }
 
@@ -995,7 +998,7 @@ class Smarty_Compiler extends Smarty {
 
         $_params = "array('smarty_file' => " . $attrs['file'] . ", 'smarty_assign' => '$assign_var', 'smarty_once' => $once_var, 'smarty_include_vars' => array(".implode(',', $arg_list)."))";
 
-        return "<?php Smarty_Core::smarty_include_php($_params, \$this); ?>" . $this->_additional_newline;
+        return "<?php \Smarty2\Core::smarty_include_php($_params, \$this); ?>" . $this->_additional_newline;
     }
 
 
@@ -2142,7 +2145,7 @@ class Smarty_Compiler extends Smarty {
                 if ($prefilter === false) {
                     unset($this->_plugins['prefilter'][$filter_name]);
                     $_params = array('plugins' => array(array('prefilter', $filter_name, null, null, false)));
-                    Smarty_Core::load_plugins($_params, $this);
+                    \Smarty\Core::load_plugins($_params, $this);
                 }
             }
         }
@@ -2151,7 +2154,7 @@ class Smarty_Compiler extends Smarty {
                 if ($postfilter === false) {
                     unset($this->_plugins['postfilter'][$filter_name]);
                     $_params = array('plugins' => array(array('postfilter', $filter_name, null, null, false)));
-                    Smarty_Core::oad_plugins($_params, $this);
+                    \Smarty\Core::load_plugins($_params, $this);
                 }
             }
         }

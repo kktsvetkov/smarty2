@@ -1,26 +1,13 @@
 <?php
 
-/**
- * set SMARTY_DIR to absolute path to Smarty library files.
- * if not defined, include_path will be used. Sets SMARTY_DIR only if user
- * application has not already defined it.
- */
-
-if (!defined('SMARTY_DIR')) {
-    define('SMARTY_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
-}
-
-define('SMARTY_PHP_PASSTHRU',   0);
-define('SMARTY_PHP_QUOTE',      1);
-define('SMARTY_PHP_REMOVE',     2);
-define('SMARTY_PHP_ALLOW',      3);
+namespace Smarty2;
 
 /**
 * Smarty2 - the PHP template engine
 *
 * @package Smarty2
 */
-class Smarty
+class Engine
 {
         /**
         * Smarty version number
@@ -207,7 +194,7 @@ class Smarty
      *
      * @var string
      */
-    var $compiler_class        =   'Smarty_Compiler';
+    var $compiler_class = Compiler::class;
 
 /**#@+
  * END Smarty Configuration Section
@@ -670,7 +657,7 @@ class Smarty
         switch ($type) {
             case 'output':
                 $_params = array('plugins' => array(array($type . 'filter', $name, null, null, false)));
-                Smarty_Core::load_plugins($_params, $this);
+                \Smarty2\Core::load_plugins($_params, $this);
                 break;
 
             case 'pre':
@@ -722,7 +709,7 @@ class Smarty
      * @param string $tpl_file
      * @param string $compile_id
      * @param string $exp_time
-     * @return boolean results of {@link Smarty_Core::rm_auto()}
+     * @return boolean results of {@link \Smarty2\Core::rm_auto()}
      */
     function clear_compiled_tpl($tpl_file = null, $compile_id = null, $exp_time = null)
     {
@@ -734,7 +721,7 @@ class Smarty
                         'auto_id' => $compile_id,
                         'exp_time' => $exp_time,
                         'extensions' => array('.php'));
-        return Smarty_Core::rm_auto($_params, $this);
+        return \Smarty2\Core::rm_auto($_params, $this);
     }
 
     /**
@@ -960,7 +947,7 @@ class Smarty
     function _get_plugin_filepath($type, $name)
     {
         $_params = array('type' => $type, 'name' => $name);
-        return Smarty_Core::assemble_plugin_filepath($_params, $this);
+        return \Smarty2\Core::assemble_plugin_filepath($_params, $this);
     }
 
    /**
@@ -1019,7 +1006,7 @@ class Smarty
                 'compile_path'=>$compile_path,
                 'compiled_content' => $_compiled_content
                 );
-            Smarty_Core::write_compiled_resource($_params, $this);
+            \Smarty2\Core::write_compiled_resource($_params, $this);
 
             return true;
         } else {
@@ -1210,7 +1197,7 @@ class Smarty
         if (empty($this->_plugins['resource'][$params['resource_type']]))
         {
             $_params = array('type' => $params['resource_type']);
-            Smarty_core::load_resource_plugin($_params, $this);
+            \Smarty2\Core::load_resource_plugin($_params, $this);
         }
 
         return true;

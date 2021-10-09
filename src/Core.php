@@ -1,5 +1,7 @@
 <?php
 
+namespace Smarty2;
+
 /**
 * Collection of Smarty core operations
 *
@@ -7,7 +9,7 @@
 *
 * @package Smarty2
 */
-class Smarty_Core
+class Core
 {
         /**
          * assemble filepath of requested plugin
@@ -363,7 +365,7 @@ class Smarty_Core
                     'level' => 0,
                     'exp_time' => $params['exp_time']
                 );
-                $_res = Smarty_Core::rmdir($_params, $smarty);
+                $_res = self::rmdir($_params, $smarty);
             } else {
                 $_tname = $smarty->_get_auto_filename($params['auto_base'], $params['auto_source'], $params['auto_id']);
 
@@ -382,7 +384,7 @@ class Smarty_Core
                         'exp_time' => $params['exp_time']
                     );
 
-                    $_res = Smarty_Core::rmdir($_params, $smarty);
+                    $_res = self::rmdir($_params, $smarty);
                 } else {
                     // remove matching file names
                     $_handle = opendir($params['auto_base']);
@@ -438,7 +440,7 @@ class Smarty_Core
                                 'level' => $params['level'] + 1,
                                 'exp_time' => $params['exp_time']
                             );
-                            Smarty_Core::rmdir($_params, $smarty);
+                            self::rmdir($_params, $smarty);
                         }
                         else {
                             $smarty->_unlink($params['dirname'] . DIRECTORY_SEPARATOR . $_entry, $params['exp_time']);
@@ -476,7 +478,7 @@ class Smarty_Core
                                 'resource_name' => $smarty->_dequote($params['args']['script'])
                                 );
 
-                        if(!Smarty_Core::get_php_resource($_params, $smarty))
+                        if(!self::get_php_resource($_params, $smarty))
                         {
                                 return false;
                         }
@@ -530,7 +532,7 @@ class Smarty_Core
         {
             $_params = array('resource_name' => $params['smarty_file']);
 
-            Smarty_Core::get_php_resource($_params, $smarty);
+            self::get_php_resource($_params, $smarty);
             $_smarty_resource_type = $_params['resource_type'];
             $_smarty_php_resource = $_params['php_resource'];
 
@@ -587,7 +589,7 @@ class Smarty_Core
                     'contents' => $params['compiled_content'],
                     'create_dirs' => true);
 
-            Smarty_Core::write_file($_params, $smarty);
+            self::write_file($_params, $smarty);
             return true;
         }
 
@@ -605,7 +607,7 @@ class Smarty_Core
 
             if ($params['create_dirs']) {
                 $_params = array('dir' => $_dirname);
-                Smarty_Core::create_dir_structure($_params, $smarty);
+                self::create_dir_structure($_params, $smarty);
             }
 
             // write to tmp file, then rename it to avoid file locking race condition
