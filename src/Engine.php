@@ -653,30 +653,6 @@ class Engine
     }
 
     /**
-     * {@deprecated}
-     */
-    function clear_cache()
-    {
-            return false;
-    }
-
-    /**
-     * {@deprecated}
-     */
-    function clear_all_cache()
-    {
-        return false;
-    }
-
-    /**
-     * {@deprecated}
-     */
-    function is_cached()
-    {
-            return false;
-    }
-
-    /**
      * clear all the assigned template variables.
      *
      */
@@ -1228,19 +1204,6 @@ class Engine
             return $string;
     }
 
-        /**
-        * {@deprecated}
-        */
-        function _read_file($filename)
-        {
-                if (!is_file($filename))
-                {
-                        return '';
-                }
-
-                return file_get_contents($filename);
-        }
-
     /**
      * get a concrete filename for automagically created content
      *
@@ -1275,22 +1238,6 @@ class Engine
         }
 
         return $_return;
-    }
-
-        /**
-        * {@deprecated}
-        * @internal use Smarty2\Core::unlink() instead
-        */
-        function _unlink($resource, $exp_time = null)
-        {
-                return Core::unlink($resource, $exp_time);
-        }
-
-    /**
-     * {@deprecated}
-     */
-    function _get_auto_id() {
-            return null;
     }
 
     /**
@@ -1353,37 +1300,29 @@ class Engine
         }
     }
 
-    /**
-     * {@deprecated}
-     */
-    function &_smarty_cache_attrs()
-    {
-            static $dummy = [];
-            return $dummy;
-    }
-
-    /**
-     * wrapper for include() retaining $this
-     * @return mixed
-     */
-    function _include($filename, $once=false, $params=null)
-    {
-        if ($once) {
-            return include_once($filename);
-        } else {
-            return include($filename);
+        /**
+        * wrapper for include() retaining $this
+        *
+        * @param string $filename
+        * @param bool $once
+        * @param array $params
+        * @return mixed
+        */
+        function _include($filename, $once=false, $params=null)
+        {
+                return $once
+                        ? include_once($filename)
+                        : include($filename);
         }
-    }
 
-
-    /**
-     * wrapper for eval() retaining $this
-     * @return mixed
-     */
-    function _eval($code, $params=null)
-    {
-        return eval($code);
-    }
+        /**
+        * wrapper for eval() retaining $this
+        * @return mixed
+        */
+        function _eval($code, $params=null)
+        {
+                return eval($code);
+        }
 
         /**
         * Extracts the filter name from the given callback
@@ -1403,4 +1342,75 @@ class Engine
 
                 return $function;
         }
+
+        /**#@+
+        * Deprecated Methods Section
+        */
+
+        /**
+        * {@deprecated}
+        */
+        function clear_cache()
+        {
+                return false;
+        }
+
+        /**
+        * {@deprecated}
+        */
+        function clear_all_cache()
+        {
+                return false;
+        }
+
+        /**
+        * {@deprecated}
+        */
+        function is_cached()
+        {
+                return false;
+        }
+
+        /**
+        * {@deprecated}
+        */
+        function _get_auto_id()
+        {
+                return null;
+        }
+
+        /**
+        * {@deprecated}
+        */
+        function _read_file($filename)
+        {
+                if (!is_file($filename))
+                {
+                        return '';
+                }
+
+                return file_get_contents($filename);
+        }
+
+        /**
+        * {@deprecated}
+        */
+        function &_smarty_cache_attrs()
+        {
+                static $dummy = [];
+                return $dummy;
+        }
+
+        /**
+        * {@deprecated}
+        * @internal use Smarty2\Core::unlink() instead
+        */
+        function _unlink($resource, $exp_time = null)
+        {
+                return Core::unlink($resource, $exp_time);
+        }
+
+        /**#@+
+        * END Deprecated Methods Section
+        */
 }
