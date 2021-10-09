@@ -910,7 +910,8 @@ class Smarty_Compiler extends Smarty {
 
         $_params = "array('args' => array(".implode(', ', (array)$arg_list)."))";
 
-        return "<?php require_once(SMARTY_CORE_DIR . 'core.run_insert_handler.php');\necho smarty_core_run_insert_handler($_params, \$this); ?>" . $this->_additional_newline;
+        return "<?php echo Smarty_Core::run_insert_handler($_params, \$this); ?>"
+                . $this->_additional_newline;
     }
 
     /**
