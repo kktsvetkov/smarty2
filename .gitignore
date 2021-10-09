@@ -1,3 +1,4 @@
 composer.lock
 vendor
 templates_c
+.phpunit.result.cache
