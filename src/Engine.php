@@ -96,7 +96,6 @@ class Engine
                                        'count', 'sizeof',
                                        'in_array', 'is_array',
                                        'true', 'false', 'null'),
-            'PHP_TAGS'        => false,
             'MODIFIER_FUNCS'  => array('count'),
             'ALLOW_CONSTANTS'  => false,
             'ALLOW_SUPER_GLOBALS' => true

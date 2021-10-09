@@ -500,14 +500,14 @@ class Compiler extends Engine
                         return '';
 
                     case 3: /* literal */
-                        return "<?php echo '" . strtr($block[2], array("'"=>"\'", "\\"=>"\\\\")) . "'; ?>" . $this->_additional_newline;
+                        return "<?php echo '"
+                                . strtr($block[2], array("'"=>"\'", "\\"=>"\\\\")) . "'; ?>"
+                                . $this->_additional_newline;
 
-                    case 4: /* php */
-                        if ($this->security && !$this->security_settings['PHP_TAGS']) {
-                            $this->_syntax_error("(secure mode) php tags not permitted", E_USER_WARNING, __FILE__, __LINE__);
-                            return;
-                        }
-                        return '<?php ' . $block[3] .' ?>';
+                    case 4: /* {php} tag, always remove it */
+                        return '<?php /* php code at line '
+                                . $this->_current_line_no
+                                .' removed! */ ?>';
                 }
                 break;
 
