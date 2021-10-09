@@ -19,6 +19,8 @@ or you can just use the composer tool:
 php composer.phar require kktsvetkov/smarty2
 ```
 
+#### Folders
+
 Additionally you will need to create few folders. Using the default
 settings, those folders are "templates" (to read the templates from),
 and "templates_c" (to write the compiled templates into). If you want
@@ -31,6 +33,12 @@ compiled templates) is writable by your web server user (usually nobody):
 chown nobody:nobody templates_c;
 chmod 700 templates_c
 ```
+
+#### Namespace
+
+The project was converted to use a PSR-4 loaded namespace called `Smarty2`.
+The legacy class names of `Smarty` and `Smarty_Compiler` are still available
+as aliased to their descendants at `Smarty2\Engine` and `Smarty2\Compiler`.
 
 ## Debugging
 
