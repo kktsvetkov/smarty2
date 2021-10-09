@@ -25,21 +25,21 @@ class Engine
      *
      * @var string
      */
-    var $template_dir    =  'templates';
+    public string $template_dir    =  'templates';
 
     /**
      * The directory where compiled templates are located.
      *
      * @var string
      */
-    var $compile_dir     =  'templates_c';
+    public string $compile_dir     =  'templates_c';
 
     /**
      * An array of directories searched for plugins.
      *
      * @var array
      */
-    var $plugins_dir     =  array('plugins');
+    public array $plugins_dir     =  array('plugins');
 
     /**
      * If debugging is enabled, debugging stats will be collected in
@@ -47,14 +47,14 @@ class Engine
      *
      * @var boolean
      */
-    var $debugging       =  false;
+    public bool $debugging       =  false;
 
     /**
      * When set, smarty does uses this value as error_reporting-level.
      *
      * @var integer
      */
-    var $error_reporting  =  null;
+    public ?int $error_reporting  =  null;
 
     /**
      * This tells Smarty whether to check for recompiling or not. Recompiling
@@ -64,7 +64,7 @@ class Engine
      *
      * @var boolean
      */
-    var $compile_check   =  true;
+    public bool $compile_check   =  true;
 
     /**
      * This forces templates to compile every time. Useful for development
@@ -72,7 +72,7 @@ class Engine
      *
      * @var boolean
      */
-    var $force_compile   =  false;
+    public bool $force_compile   =  false;
 
     /**
      * This enables template security. When enabled, many things are restricted
@@ -82,7 +82,7 @@ class Engine
      *
      * @var boolean
      */
-    var $security       =   false;
+    public bool $security       =   false;
 
     /**
      * These are the security settings for Smarty. They are used only when
@@ -90,7 +90,7 @@ class Engine
      *
      * @var array
      */
-    var $security_settings  = array(
+    public array $security_settings  = array(
             'IF_FUNCS'        => array('array', 'list',
                                        'isset', 'empty',
                                        'count', 'sizeof',
@@ -106,14 +106,14 @@ class Engine
      *
      * @var string
      */
-    var $left_delimiter  =  '{';
+    public string $left_delimiter  =  '{';
 
     /**
      * The right delimiter used for the template tags.
      *
      * @var string
      */
-    var $right_delimiter =  '}';
+    public string $right_delimiter =  '}';
 
     /**
      * Set this if you want different sets of compiled files for the same
@@ -123,7 +123,7 @@ class Engine
      *
      * @var string
      */
-    var $compile_id            = null;
+    public string $compile_id = '';
 
     /**
      * This tells Smarty whether or not to use sub dirs in the
@@ -133,7 +133,7 @@ class Engine
      * @var boolean
      *
      */
-    var $use_sub_dirs          = false;
+    public bool $use_sub_dirs          = false;
 
     /**
      * This is a list of the modifiers to apply to all template variables.
@@ -142,7 +142,7 @@ class Engine
      *
      * @var array
      */
-    var $default_modifiers        = array();
+    public array $default_modifiers        = array();
 
     /**
      * This is the resource type to be used when not specified
@@ -156,14 +156,14 @@ class Engine
      *
      * @var array
      */
-    var $default_resource_type    = 'file';
+    public string $default_resource_type    = 'file';
 
     /**
      * This indicates which filters are automatically loaded into Smarty.
      *
      * @var array array of filter names
      */
-    var $autoload_filters = array();
+    public array $autoload_filters = array();
 
     /**
      * If a template cannot be found, this PHP function will be executed.
@@ -178,7 +178,7 @@ class Engine
      *
      * @var string
      */
-    var $compiler_class = Compiler::class;
+    public string $compiler_class = Compiler::class;
 
 /**#@+
  * END Smarty Configuration Section
@@ -1339,12 +1339,10 @@ class Engine
     function _smarty_include($params)
     {
         if ($this->debugging) {
-            $_params = array();
-
             $debug_start_time = microtime(true);
             $this->_smarty_debug_info[] = array('type'      => 'template',
-                                                  'filename'  => $params['smarty_include_tpl_file'],
-                                                  'depth'     => ++$this->_inclusion_depth);
+                        'filename'  => $params['smarty_include_tpl_file'],
+                        'depth'     => ++$this->_inclusion_depth);
             $included_tpls_idx = count($this->_smarty_debug_info) - 1;
         }
 
@@ -1362,7 +1360,6 @@ class Engine
 
         if ($this->debugging) {
             // capture time for debugging info
-            $_params = array();
             $this->_smarty_debug_info[$included_tpls_idx]['exec_time'] =
             microtime(true) - $debug_start_time;
         }
