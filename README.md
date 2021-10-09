@@ -109,9 +109,9 @@ was dropped. The core project files are moved to `src/`, and the `plugins/`
 folder is moved to the root. The `SMARTY_DIR` used to load the plugins is adjusted
 accordingly to point to the correct folder.
 
-## From Original README
+## What is Smarty?
 
-**What is Smarty?**
+*(From Original README)*
 
 Smarty is a template engine for PHP. Many other template engines for PHP
 provide basic variable substitution and dynamic block functionality.
