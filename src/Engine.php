@@ -1080,11 +1080,15 @@ class Engine
             $_resource_name = $_params['resource_name'];
             switch ($_resource_type) {
                 case 'file':
-                    if ($params['get_source']) {
-                        $params['source_content'] = $this->_read_file($_resource_name);
-                    }
-                    $params['resource_timestamp'] = filemtime($_resource_name);
                     $_return = is_file($_resource_name) && is_readable($_resource_name);
+                    if ($_return)
+                    {
+                        if ($params['get_source'])
+                        {
+                            $params['source_content'] = file_get_contents($_resource_name);
+                        }
+                        $params['resource_timestamp'] = filemtime($_resource_name);
+                    }
                     break;
 
                 default:
@@ -1224,26 +1228,18 @@ class Engine
             return $string;
     }
 
+        /**
+        * {@deprecated}
+        */
+        function _read_file($filename)
+        {
+                if (!is_file($filename))
+                {
+                        return '';
+                }
 
-    /**
-     * read in a file
-     *
-     * @param string $filename
-     * @return string
-     */
-    function _read_file($filename)
-    {
-        if ( file_exists($filename) && is_readable($filename) && ($fd = @fopen($filename, 'rb')) ) {
-            $contents = '';
-            while (!feof($fd)) {
-                $contents .= fread($fd, 8192);
-            }
-            fclose($fd);
-            return $contents;
-        } else {
-            return false;
+                return file_get_contents($filename);
         }
-    }
 
     /**
      * get a concrete filename for automagically created content
