@@ -88,6 +88,19 @@ and do nothing.
 Consider other options for caching for your web app, not within the
 presentation layer that Smarty provides.
 
+## Internals (from libs/internals)
+
+The `libs/internals` folder is removed from the project. All of the core
+internals are moved as methods to the `Smarty_Core` class, which eventually
+became the `Smarty2\Core` class.
+
+## Plugins (from libs/plugins)
+
+As the project was converted to using PSR-4 loaded namespace, the `libs/` folder
+was dropped. The core project files are moved to `src/`, and the `plugins/`
+folder is moved to the root. The `SMARTY_DIR` used to load the plugins is adjusted
+accordingly to point to the correct folder.
+
 ## From Original README
 
 **What is Smarty?**
