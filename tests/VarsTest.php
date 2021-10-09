@@ -1,24 +1,12 @@
 <?php
 
-namespace Smarty\Tests;
+namespace Smarty2\Tests;
 
 use Smarty2\Engine;
-use PHPUnit\Framework\TestCase;
+use Smarty2\Tests\TestCase;
 
 class VarsTest extends TestCase
 {
-        protected Engine $smarty;
-
-        function setUp() : void
-        {
-                $this->smarty = new Engine;
-        }
-
-        function tearDown() : void
-        {
-                unset($this->smarty);
-        }
-
 	/**
 	* @covers Smarty2\Engine::__construct()
         * @covers Smarty2\Engine::assign()
