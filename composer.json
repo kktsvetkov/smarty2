@@ -19,6 +19,7 @@
                     "email": "uwe.tews@googlemail.com"
                 }
         ],
+
         "require": {
                 "php": ">=7.1"
         },
@@ -30,11 +31,11 @@
                 "files": ["autoload-legacy.php"]
         },
 
-	"require-dev": {
-		"phpunit/phpunit": "^7.5 || ^8.5"
-	},
+        "require": {
+                "phpunit/phpunit": "^9.5"
+        },
 
-        "autoload-dev": {
+	"autoload-dev": {
 		"psr-4": {
 			"Smarty2\\Tests\\": "tests/"
 		}
