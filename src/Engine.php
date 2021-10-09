@@ -75,20 +75,6 @@ class Engine
     var $force_compile   =  false;
 
     /**
-     * This determines how Smarty handles "<?php ... ?>" tags in templates.
-     * possible values:
-     * <ul>
-     *  <li>SMARTY_PHP_PASSTHRU -> print tags as plain text</li>
-     *  <li>SMARTY_PHP_QUOTE    -> escape tags as entities</li>
-     *  <li>SMARTY_PHP_REMOVE   -> remove php tags</li>
-     *  <li>SMARTY_PHP_ALLOW    -> execute php tags</li>
-     * </ul>
-     *
-     * @var integer
-     */
-    var $php_handling    =  SMARTY_PHP_PASSTHRU;
-
-    /**
      * This enables template security. When enabled, many things are restricted
      * in the templates that normally would go unchecked. This is useful when
      * untrusted parties are editing templates and you want a reasonable level
@@ -105,17 +91,16 @@ class Engine
      * @var array
      */
     var $security_settings  = array(
-                                    'PHP_HANDLING'    => false,
-                                    'IF_FUNCS'        => array('array', 'list',
-                                                               'isset', 'empty',
-                                                               'count', 'sizeof',
-                                                               'in_array', 'is_array',
-                                                               'true', 'false', 'null'),
-                                    'PHP_TAGS'        => false,
-                                    'MODIFIER_FUNCS'  => array('count'),
-                                    'ALLOW_CONSTANTS'  => false,
-                                    'ALLOW_SUPER_GLOBALS' => true
-                                   );
+            'IF_FUNCS'        => array('array', 'list',
+                                       'isset', 'empty',
+                                       'count', 'sizeof',
+                                       'in_array', 'is_array',
+                                       'true', 'false', 'null'),
+            'PHP_TAGS'        => false,
+            'MODIFIER_FUNCS'  => array('count'),
+            'ALLOW_CONSTANTS'  => false,
+            'ALLOW_SUPER_GLOBALS' => true
+           );
 
     /**
      * The left delimiter used for the template tags.
@@ -1033,7 +1018,6 @@ class Engine
         $smarty_compiler->plugins_dir       = $this->plugins_dir;
 
         $smarty_compiler->force_compile     = $this->force_compile;
-        $smarty_compiler->php_handling      = $this->php_handling;
         $smarty_compiler->left_delimiter    = $this->left_delimiter;
         $smarty_compiler->right_delimiter   = $this->right_delimiter;
         $smarty_compiler->_version          = $this->_version;

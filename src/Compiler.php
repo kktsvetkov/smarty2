@@ -194,15 +194,6 @@ class Compiler extends Engine
      */
     function _compile_file($resource_name, $source_content, &$compiled_content)
     {
-
-        if ($this->security) {
-            // do not allow php syntax to be executed unless specified
-            if ($this->php_handling == SMARTY_PHP_ALLOW &&
-                !$this->security_settings['PHP_HANDLING']) {
-                $this->php_handling = SMARTY_PHP_PASSTHRU;
-            }
-        }
-
         $this->_load_filters();
 
         $this->_current_file = $resource_name;
@@ -246,26 +237,14 @@ class Compiler extends Engine
             if (preg_match_all('~(<\?(?:\w+|=)?|\?>|language\s*=\s*[\"\']?\s*php\s*[\"\']?)~is', $text_blocks[$curr_tb], $sp_match)) {
                 /* replace tags with placeholders to prevent recursive replacements */
                 $sp_match[1] = array_unique($sp_match[1]);
-                usort($sp_match[1], '_smarty_sort_length');
+                usort($sp_match[1], __CLASS__ . '::_smarty_sort_length');
                 for ($curr_sp = 0, $for_max2 = count($sp_match[1]); $curr_sp < $for_max2; $curr_sp++) {
                     $text_blocks[$curr_tb] = str_replace($sp_match[1][$curr_sp],'%%%SMARTYSP'.$curr_sp.'%%%',$text_blocks[$curr_tb]);
                 }
                 /* process each one */
                 for ($curr_sp = 0, $for_max2 = count($sp_match[1]); $curr_sp < $for_max2; $curr_sp++) {
-                    if ($this->php_handling == SMARTY_PHP_PASSTHRU) {
-                        /* echo php contents */
-                        $text_blocks[$curr_tb] = str_replace('%%%SMARTYSP'.$curr_sp.'%%%', '<?php echo \''.str_replace("'", "\'", $sp_match[1][$curr_sp]).'\'; ?>'."\n", $text_blocks[$curr_tb]);
-                    } else if ($this->php_handling == SMARTY_PHP_QUOTE) {
-                        /* quote php tags */
+                                            /* quote php tags */
                         $text_blocks[$curr_tb] = str_replace('%%%SMARTYSP'.$curr_sp.'%%%', htmlspecialchars($sp_match[1][$curr_sp]), $text_blocks[$curr_tb]);
-                    } else if ($this->php_handling == SMARTY_PHP_REMOVE) {
-                        /* remove php tags */
-                        $text_blocks[$curr_tb] = str_replace('%%%SMARTYSP'.$curr_sp.'%%%', '', $text_blocks[$curr_tb]);
-                    } else {
-                        /* SMARTY_PHP_ALLOW, but echo non php starting tags */
-                        $sp_match[1][$curr_sp] = preg_replace('~(<\?(?!php|=|$))~i', '<?php echo \'\\1\'?>'."\n", $sp_match[1][$curr_sp]);
-                        $text_blocks[$curr_tb] = str_replace('%%%SMARTYSP'.$curr_sp.'%%%', $sp_match[1][$curr_sp], $text_blocks[$curr_tb]);
-                    }
                 }
             }
         }
@@ -2249,28 +2228,23 @@ class Compiler extends Engine
                              E_USER_ERROR, __FILE__, __LINE__);
     }
 
+    /**
+     * compare to values by their string length
+     *
+     * @access private
+     * @param string $a
+     * @param string $b
+     * @return 0|-1|1
+     */
+    function _smarty_sort_length($a, $b)
+    {
+        if($a == $b)
+            return 0;
+
+        if(strlen($a) == strlen($b))
+            return ($a > $b) ? -1 : 1;
+
+        return (strlen($a) > strlen($b)) ? -1 : 1;
+    }
+
 }
-
-/**
- * compare to values by their string length
- *
- * @access private
- * @param string $a
- * @param string $b
- * @return 0|-1|1
- */
-function _smarty_sort_length($a, $b)
-{
-    if($a == $b)
-        return 0;
-
-    if(strlen($a) == strlen($b))
-        return ($a > $b) ? -1 : 1;
-
-    return (strlen($a) > strlen($b)) ? -1 : 1;
-}
-
-
-/* vim: set et: */
-
-?>
