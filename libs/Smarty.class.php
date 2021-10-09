@@ -726,7 +726,7 @@ class Smarty
      * @param string $tpl_file
      * @param string $compile_id
      * @param string $exp_time
-     * @return boolean results of {@link smarty_core_rm_auto()}
+     * @return boolean results of {@link Smarty_Core::rm_auto()}
      */
     function clear_compiled_tpl($tpl_file = null, $compile_id = null, $exp_time = null)
     {
@@ -737,9 +737,8 @@ class Smarty
                         'auto_source' => $tpl_file,
                         'auto_id' => $compile_id,
                         'exp_time' => $exp_time,
-                        'extensions' => array('.inc', '.php'));
-        require_once(SMARTY_CORE_DIR . 'core.rm_auto.php');
-        return smarty_core_rm_auto($_params, $this);
+                        'extensions' => array('.php'));
+        return Smarty_Core::rm_auto($_params, $this);
     }
 
     /**
