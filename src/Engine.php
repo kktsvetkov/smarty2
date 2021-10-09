@@ -669,19 +669,12 @@ class Engine
      * @param string $tpl_file
      * @param string $compile_id
      * @param string $exp_time
-     * @return boolean results of {@link \Smarty2\Core::rm_auto()}
+     * @return boolean results of {@link \Smarty2\Core::unlink()}
      */
     function clear_compiled_tpl($tpl_file = null, $compile_id = null, $exp_time = null)
     {
-        if (!isset($compile_id)) {
-            $compile_id = $this->compile_id;
-        }
-        $_params = array('auto_base' => $this->compile_dir,
-                        'auto_source' => $tpl_file,
-                        'auto_id' => $compile_id,
-                        'exp_time' => $exp_time,
-                        'extensions' => array('.php'));
-        return \Smarty2\Core::rm_auto($_params, $this);
+        $smarty_compile_tpl = $this->_get_compile_path($tpl_file, $compile_id);
+        return \Smarty2\Core::unlink($smarty_compile_tpl, $exp_time);
     }
 
     /**
@@ -1017,12 +1010,15 @@ class Engine
      * Get the compile path for this resource
      *
      * @param string $resource_name
+     * @param string $compile_id
      * @return string results of {@link _get_auto_filename()}
      */
-    function _get_compile_path($resource_name)
+    function _get_compile_path($resource_name, $compile_id = null)
     {
-        return $this->_get_auto_filename($this->compile_dir, $resource_name,
-                                         $this->_compile_id) . '.php';
+        return $this->_get_auto_filename(
+                $this->compile_dir,
+                $resource_name,
+                $compile_id ?? $this->compile_id) . '.php';
     }
 
     /**
