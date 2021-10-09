@@ -18,7 +18,7 @@ class Core
          * @param string $name
          * @return string|false
          */
-        function assemble_plugin_filepath($params, &$smarty)
+        static function assemble_plugin_filepath($params, &$smarty)
         {
             $_plugin_filename = $params['type'] . '.' . $params['name'] . '.php';
             if (isset($smarty->_filepaths_cache[$_plugin_filename])) {
@@ -54,7 +54,7 @@ class Core
          * create full directory structure
          * @param string $dir
          */
-        function create_dir_structure($params, &$smarty)
+        static function create_dir_structure($params, &$smarty)
         {
             if (!is_dir($params['dir'])) {
 
@@ -106,17 +106,17 @@ class Core
             }
         }
 
-
         /**
          * Retrieves PHP script resource
          *
-         * sets $php_resource to the returned resource
+         * Sets $php_resource to the returned resource
+         *
          * @param string $resource
          * @param string $resource_type
-         * @param  $php_resource
+         * @param mixed $php_resource
          * @return boolean
          */
-        function get_php_resource(&$params, &$smarty)
+        static function get_php_resource(&$params, &$smarty)
         {
             $params['resource_base_path'] = array();
             $smarty->_parse_resource_name($params, $smarty);
@@ -165,7 +165,7 @@ class Core
          *
          * @param array $plugins
          */
-        function load_plugins($params, &$smarty)
+        static function load_plugins($params, &$smarty)
         {
             foreach ($params['plugins'] as $_plugin_info) {
                 list($_type, $_name, $_tpl_file, $_tpl_line, $_delayed_loading) = $_plugin_info;
@@ -277,7 +277,7 @@ class Core
         * @param string $type
         * @param Smarty $smarty
         */
-        function load_resource_plugin($type, &$smarty)
+        static function load_resource_plugin($type, &$smarty)
         {
             /*
              * Resource plugins are not quite like the other ones, so they are
@@ -354,7 +354,7 @@ class Core
          * @param integer $exp_time
          * @return boolean
          */
-        function rm_auto($params, &$smarty)
+        static function rm_auto($params, &$smarty)
         {
             if (!@is_dir($params['auto_base']))
               return false;
@@ -370,14 +370,18 @@ class Core
                 $_tname = $smarty->_get_auto_filename($params['auto_base'], $params['auto_source'], $params['auto_id']);
 
                 if(isset($params['auto_source'])) {
-                    if (isset($params['extensions'])) {
+                    if (isset($params['extensions']))
+                    {
                         $_res = false;
                         foreach ((array)$params['extensions'] as $_extension)
-                            $_res |= $smarty->_unlink($_tname.$_extension, $params['exp_time']);
-                    } else {
-                        $_res = $smarty->_unlink($_tname, $params['exp_time']);
+                            $_res |= self::unlink($_tname.$_extension, $params['exp_time']);
+                    } else
+                    {
+                        $_res = self::unlink($_tname, $params['exp_time']);
                     }
-                } elseif ($smarty->use_sub_dirs) {
+                } else
+                if ($smarty->use_sub_dirs)
+                {
                     $_params = array(
                         'dirname' => $_tname,
                         'level' => 1,
@@ -393,7 +397,7 @@ class Core
                         if($_filename == '.' || $_filename == '..') {
                             continue;
                         } elseif (substr($params['auto_base'] . DIRECTORY_SEPARATOR . $_filename, 0, strlen($_tname)) == $_tname) {
-                            $_res &= (bool)$smarty->_unlink($params['auto_base'] . DIRECTORY_SEPARATOR . $_filename, $params['exp_time']);
+                            $_res &= self::unlink($params['auto_base'] . DIRECTORY_SEPARATOR . $_filename, $params['exp_time']);
                         }
                     }
                 }
@@ -412,7 +416,7 @@ class Core
          * @param integer $exp_time
          * @return boolean
          */
-        function rmdir($params, &$smarty)
+        static function rmdir($params, &$smarty)
         {
                 if (empty($params['dirname']))
                 {
@@ -443,7 +447,7 @@ class Core
                             self::rmdir($_params, $smarty);
                         }
                         else {
-                            $smarty->_unlink($params['dirname'] . DIRECTORY_SEPARATOR . $_entry, $params['exp_time']);
+                            self::unlink($params['dirname'] . DIRECTORY_SEPARATOR . $_entry, $params['exp_time']);
                         }
                     }
                 }
@@ -463,12 +467,10 @@ class Core
          * @param array $args
          * @return string
          */
-        function run_insert_handler($params, &$smarty)
+        static function run_insert_handler($params, &$smarty)
         {
-
                 if ($smarty->debugging)
                 {
-                        $_params = array();
                         $_debug_start_time = microtime(true);
                 }
 
@@ -528,7 +530,7 @@ class Core
          * @param array $smarty_include_vars associative array of vars from
          *              {include file="blah" var=$var}
          */
-        function smarty_include_php($params, &$smarty)
+        static function smarty_include_php($params, &$smarty)
         {
             $_params = array('resource_name' => $params['smarty_file']);
 
@@ -562,7 +564,7 @@ class Core
          * @param string $compiled_content
          * @return boolean
          */
-        function write_compiled_resource($params, &$smarty)
+        static function write_compiled_resource($params, &$smarty)
         {
                 if (!is_dir($smarty->compile_dir))
                 {
@@ -601,7 +603,7 @@ class Core
          * @param boolean $create_dirs
          * @return boolean
          */
-        function write_file($params, &$smarty)
+        static function write_file($params, &$smarty)
         {
             $_dirname = dirname($params['filename']);
 
@@ -636,4 +638,26 @@ class Core
             return true;
         }
 
+        /**
+        * unlink a file, possibly using expiration time
+        *
+        * @param string $resource
+        * @param integer $exp_time
+        */
+        static function unlink(string $resource, $exp_time = null)
+        {
+                if (!is_file($resource))
+                {
+                        return false;
+                }
+
+                if (!empty($exp_time))
+                {
+                        return (time() - filemtime($resource) >= $exp_time)
+                                ? unlink($resource)
+                                : false;
+                }
+
+                return unlink($resource);
+        }
 }

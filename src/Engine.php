@@ -1281,22 +1281,14 @@ class Engine
         return $_return;
     }
 
-    /**
-     * unlink a file, possibly using expiration time
-     *
-     * @param string $resource
-     * @param integer $exp_time
-     */
-    function _unlink($resource, $exp_time = null)
-    {
-        if(isset($exp_time)) {
-            if(time() - @filemtime($resource) >= $exp_time) {
-                return @unlink($resource);
-            }
-        } else {
-            return @unlink($resource);
+        /**
+        * {@deprecated}
+        * @internal use Smarty2\Core::unlink() instead
+        */
+        function _unlink($resource, $exp_time = null)
+        {
+                return Core::unlink($resource, $exp_time);
         }
-    }
 
     /**
      * {@deprecated}
