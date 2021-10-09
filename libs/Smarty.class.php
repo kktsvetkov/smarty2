@@ -27,7 +27,7 @@ class Smarty
         *
         * @var string
         */
-        var $_version = '2.6.33';
+        var $_version = '2.6.34';
 
     /**#@+
      * Smarty Configuration Section
