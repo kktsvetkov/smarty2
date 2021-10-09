@@ -290,8 +290,7 @@ class Smarty_Core
                     'level' => 0,
                     'exp_time' => $params['exp_time']
                 );
-                require_once(SMARTY_CORE_DIR . 'core.rmdir.php');
-                $_res = smarty_core_rmdir($_params, $smarty);
+                $_res = Smarty_Core::rmdir($_params, $smarty);
             } else {
                 $_tname = $smarty->_get_auto_filename($params['auto_base'], $params['auto_source'], $params['auto_id']);
 
@@ -309,8 +308,8 @@ class Smarty_Core
                         'level' => 1,
                         'exp_time' => $params['exp_time']
                     );
-                    require_once(SMARTY_CORE_DIR . 'core.rmdir.php');
-                    $_res = smarty_core_rmdir($_params, $smarty);
+
+                    $_res = Smarty_Core::rmdir($_params, $smarty);
                 } else {
                     // remove matching file names
                     $_handle = opendir($params['auto_base']);
@@ -326,6 +325,61 @@ class Smarty_Core
             }
 
             return $_res;
+        }
+
+
+        /**
+         * delete a dir recursively (level=0 -> keep root)
+         * WARNING: no tests, it will try to remove what you tell it!
+         *
+         * @param string $dirname
+         * @param integer $level
+         * @param integer $exp_time
+         * @return boolean
+         */
+        function rmdir($params, &$smarty)
+        {
+                if (empty($params['dirname']))
+                {
+                        $smarty->trigger_error('Empty dirname for ' . __METHOD__ . '()');
+                        return false;
+                }
+
+                if (!is_dir($params['dirname']))
+                {
+                        $smarty->trigger_error(
+                                __METHOD__ . "(): not a dir {$params['dirname']}");
+                        return false;
+                }
+
+           if(!isset($params['level'])) { $params['level'] = 1; }
+           if(!isset($params['exp_time'])) { $params['exp_time'] = null; }
+
+           if($_handle = opendir($params['dirname'])) {
+
+                while (false !== ($_entry = readdir($_handle))) {
+                    if ($_entry != '.' && $_entry != '..') {
+                        if (is_dir($params['dirname'] . DIRECTORY_SEPARATOR . $_entry)) {
+                            $_params = array(
+                                'dirname' => $params['dirname'] . DIRECTORY_SEPARATOR . $_entry,
+                                'level' => $params['level'] + 1,
+                                'exp_time' => $params['exp_time']
+                            );
+                            Smarty_Core::rmdir($_params, $smarty);
+                        }
+                        else {
+                            $smarty->_unlink($params['dirname'] . DIRECTORY_SEPARATOR . $_entry, $params['exp_time']);
+                        }
+                    }
+                }
+                closedir($_handle);
+           }
+
+           if ($params['level']) {
+               return @rmdir($params['dirname']);
+           }
+           return (bool)$_handle;
+
         }
 
 
