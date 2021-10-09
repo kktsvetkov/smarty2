@@ -19,7 +19,7 @@ This fork is started from [**Smarty 2.6.31**](https://github.com/smarty-php/smar
 To get the latest stable version add this in your `composer.json` file:
 ```
 	"require": {
-	   "kktsvetkov/smarty2": "~2.6"
+	   "kktsvetkov/smarty2": "~2.7"
 	}
 ```
 or you can just use the composer tool:

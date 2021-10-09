@@ -14,7 +14,7 @@ class Engine
         *
         * @var string
         */
-        var $_version = '2.6.34';
+        var $_version = '2.7.1';
 
     /**#@+
      * Smarty Configuration Section
