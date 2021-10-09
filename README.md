@@ -117,6 +117,19 @@ was dropped. The core project files are moved to `src/`, and the `plugins/`
 folder is moved to the root. The `SMARTY_DIR` used to load the plugins is adjusted
 accordingly to point to the correct folder.
 
+## PHP_HANDLING
+
+Any PHP code a la `<?php do_something(); ?>` inside the templates will always
+be printed in the template in its quoted form. This is the behaviour that used
+to be triggered by the `SMARTY_PHP_QUOTE` setting of `$smarty->php_handling`.
+Now that's the only available option.
+
+## {php} block tags
+
+It goes without saying how bad of an idea is to use the `{php}` block tags.
+Now all of those tags will be stripped when the template is compiled. The
+`PHP_TAGS` security option is also removed as it is no longer needed.
+
 ## What is Smarty?
 
 *(from original README)*
