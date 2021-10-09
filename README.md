@@ -1,10 +1,18 @@
 # Smarty 2 - the PHP compiling template engine
 
-This is a fork from [**Smarty 2.6.31**](https://github.com/smarty-php/smarty/tree/v2.6.31).
-I am involved in a project that is heavily integrated with this version of the
-library and I wanted to clean it up and make some changes to it. Mainly the changes
-involve removing outdated features and other things we do not use, but also
-improving some of the codebase and bring it closely to the state of PHP in the 2020s.
+The **Smarty 2** library is still used, even 20 years after its initial
+inception. However, it is abandoned, as the focus has shifted to the (not-so)
+newer version 3, as well as other alternatives.
+
+This project is an effort to to clean it up and make some improvements. The goal
+is to keep all of the class methods and their arguments the same, but still
+improve the underlying code and how it works. A lot of things has changed from
+2001, and PHP as a whole has evolved a lot. This needs to be reflected in this
+project, so mainly the changes involve removing outdated features and other
+things we do not use, but also improving some of the codebase and bring it
+closely to the state of PHP nowadays (in the 2020s).
+
+This fork is started from [**Smarty 2.6.31**](https://github.com/smarty-php/smarty/tree/v2.6.31).
 
 ## Installation
 
@@ -111,7 +119,7 @@ accordingly to point to the correct folder.
 
 ## What is Smarty?
 
-*(From Original README)*
+*(from original README)*
 
 Smarty is a template engine for PHP. Many other template engines for PHP
 provide basic variable substitution and dynamic block functionality.
