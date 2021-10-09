@@ -1019,9 +1019,11 @@ class Smarty
 
         if ($this->_compile_source($resource_name, $_source_content, $_compiled_content)) {
 
-            $_params = array('compile_path'=>$compile_path, 'compiled_content' => $_compiled_content);
-            require_once(SMARTY_CORE_DIR . 'core.write_compiled_resource.php');
-            smarty_core_write_compiled_resource($_params, $this);
+            $_params = array(
+                'compile_path'=>$compile_path,
+                'compiled_content' => $_compiled_content
+                );
+            Smarty_Core::write_compiled_resource($_params, $this);
 
             return true;
         } else {

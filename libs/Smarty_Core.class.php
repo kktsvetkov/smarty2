@@ -554,6 +554,44 @@ class Smarty_Core
 
 
         /**
+         * write the compiled resource
+         *
+         * @param string $compile_path
+         * @param string $compiled_content
+         * @return boolean
+         */
+        function write_compiled_resource($params, &$smarty)
+        {
+                if (!is_dir($smarty->compile_dir))
+                {
+                        $smarty->trigger_error(
+                                'the $compile_dir \''
+                                        . $smarty->compile_dir
+                                        . '\' does not exist, or is not a directory.',
+                                E_USER_ERROR);
+                        return false;
+                }
+
+            if (!is_writable($smarty->compile_dir))
+            {
+                $smarty->trigger_error(
+                        'unable to write to $compile_dir \''
+                                . realpath($smarty->compile_dir)
+                                . '\'. Be sure $compile_dir is writable by the web server user.',
+                        E_USER_ERROR);
+                return false;
+            }
+
+            $_params = array(
+                    'filename' => $params['compile_path'],
+                    'contents' => $params['compiled_content'],
+                    'create_dirs' => true);
+
+            Smarty_Core::write_file($_params, $smarty);
+            return true;
+        }
+
+        /**
          * write out a file to disk
          *
          * @param string $filename
@@ -567,7 +605,7 @@ class Smarty_Core
 
             if ($params['create_dirs']) {
                 $_params = array('dir' => $_dirname);
-                self::create_dir_structure($_params, $smarty);
+                Smarty_Core::create_dir_structure($_params, $smarty);
             }
 
             // write to tmp file, then rename it to avoid file locking race condition
