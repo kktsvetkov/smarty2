@@ -2,6 +2,11 @@
 
 namespace Smarty2;
 
+use Smarty2\Exception\SyntaxException as BadSyntaxException;
+
+use const E_USER_ERROR;
+use const E_USER_WARNING;
+
 /**
  * Template compiling class
  * @package Smarty2
@@ -260,7 +265,7 @@ class Compiler extends Engine
         }
         if (count($this->_tag_stack)>0) {
             list($_open_tag, $_line_no) = end($this->_tag_stack);
-            $this->_syntax_error("unclosed tag \{$_open_tag} (opened line $_line_no).", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("unclosed tag \{$_open_tag} (opened line $_line_no).");
             return;
         }
 
@@ -380,7 +385,7 @@ class Compiler extends Engine
                 . '|\/?' . $this->_reg_obj_regexp . '|\/?' . $this->_func_regexp . ')(' . $this->_mod_regexp . '*))
                       (?:\s+(.*))?$
                     ~xs', $template_tag, $match)) {
-            $this->_syntax_error("unrecognized tag: $template_tag", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("unrecognized tag: $template_tag");
         }
 
         $tag_command = $match[1];
@@ -412,7 +417,7 @@ class Compiler extends Engine
             case 'else':
                 list($_open_tag) = end($this->_tag_stack);
                 if ($_open_tag != 'if' && $_open_tag != 'elseif')
-                    $this->_syntax_error('unexpected {else}', E_USER_ERROR, __FILE__, __LINE__);
+                    $this->_syntax_error('unexpected {else}');
                 else
                     $this->_push_tag('else');
                 return '<?php else: ?>';
@@ -420,7 +425,7 @@ class Compiler extends Engine
             case 'elseif':
                 list($_open_tag) = end($this->_tag_stack);
                 if ($_open_tag != 'if' && $_open_tag != 'elseif')
-                    $this->_syntax_error('unexpected {elseif}', E_USER_ERROR, __FILE__, __LINE__);
+                    $this->_syntax_error('unexpected {elseif}');
                 if ($_open_tag == 'if')
                     $this->_push_tag('elseif');
                 return $this->_compile_if_tag($tag_args, true);
@@ -524,7 +529,7 @@ class Compiler extends Engine
                 } else if ($this->_compile_custom_tag($tag_command, $tag_args, $tag_modifier, $output)) {
                     return $output;
                 } else {
-                    $this->_syntax_error("unrecognized tag '$tag_command'", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->_syntax_error("unrecognized tag '{$tag_command}'");
                 }
 
         }
@@ -871,11 +876,11 @@ class Compiler extends Engine
         $name = $this->_dequote($attrs['name']);
 
         if (empty($name)) {
-            return $this->_syntax_error("missing insert name", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("missing insert name");
         }
 
         if (!preg_match('~^\w+$~', $name)) {
-            return $this->_syntax_error("'insert: 'name' must be an insert function name", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("'insert: 'name' must be an insert function name");
         }
 
         if (!empty($attrs['script'])) {
@@ -910,7 +915,7 @@ class Compiler extends Engine
         $arg_list = array();
 
         if (empty($attrs['file'])) {
-            $this->_syntax_error("missing 'file' attribute in include tag", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("missing 'file' attribute in include tag");
         }
 
         foreach ($attrs as $arg_name => $arg_value) {
@@ -962,7 +967,7 @@ class Compiler extends Engine
         $attrs = $this->_parse_attrs($tag_args);
 
         if (empty($attrs['file'])) {
-            $this->_syntax_error("missing 'file' attribute in include_php tag", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("missing 'file' attribute in include_php tag");
         }
 
         $assign_var = (empty($attrs['assign'])) ? '' : $this->_dequote($attrs['assign']);
@@ -997,7 +1002,7 @@ class Compiler extends Engine
         $output = '<?php ';
         $section_name = $attrs['name'];
         if (empty($section_name)) {
-            $this->_syntax_error("missing section name", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("missing section name");
         }
 
         $output .= "unset(\$this->_sections[$section_name]);\n";
@@ -1031,7 +1036,7 @@ class Compiler extends Engine
                     break;
 
                 default:
-                    $this->_syntax_error("unknown section attribute - '$attr_name'", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->_syntax_error("unknown section attribute - '{$attr_name}'");
                     break;
             }
         }
@@ -1100,22 +1105,22 @@ class Compiler extends Engine
         $arg_list = array();
 
         if (empty($attrs['from'])) {
-            return $this->_syntax_error("foreach: missing 'from' attribute", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("foreach: missing 'from' attribute");
         }
         $from = $attrs['from'];
 
         if (empty($attrs['item'])) {
-            return $this->_syntax_error("foreach: missing 'item' attribute", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("foreach: missing 'item' attribute");
         }
         $item = $this->_dequote($attrs['item']);
         if (!preg_match('~^\w+$~', $item)) {
-            return $this->_syntax_error("foreach: 'item' must be a variable name (literal string)", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("foreach: 'item' must be a variable name (literal string)");
         }
 
         if (isset($attrs['key'])) {
             $key  = $this->_dequote($attrs['key']);
             if (!preg_match('~^\w+$~', $key)) {
-                return $this->_syntax_error("foreach: 'key' must to be a variable name (literal string)", E_USER_ERROR, __FILE__, __LINE__);
+                return $this->_syntax_error("foreach: 'key' must to be a variable name (literal string)");
             }
             $key_part = "\$this->_tpl_vars['$key'] => ";
         } else {
@@ -1202,14 +1207,14 @@ class Compiler extends Engine
         if(empty($tokens)) {
             $_error_msg = $elseif ? "'elseif'" : "'if'";
             $_error_msg .= ' statement requires arguments';
-            $this->_syntax_error($_error_msg, E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error($_error_msg);
         }
 
 
         // make sure we have balanced parenthesis
         $token_count = array_count_values($tokens);
         if(isset($token_count['(']) && $token_count['('] != $token_count[')']) {
-            $this->_syntax_error("unbalanced parenthesis in if statement", E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error("unbalanced parenthesis in if statement");
         }
 
         $is_arg_stack = array();
@@ -1331,18 +1336,18 @@ class Compiler extends Engine
                             // function call
                             if($this->security &&
                                !in_array($token, $this->security_settings['IF_FUNCS'])) {
-                                $this->_syntax_error("(secure mode) '$token' not allowed in if statement", E_USER_ERROR, __FILE__, __LINE__);
+                                $this->_syntax_error("(secure mode) '$token' not allowed in if statement");
                             }
                     } elseif(preg_match('~^' . $this->_var_regexp . '$~', $token) && (strpos('+-*/^%&|', substr($token, -1)) === false) && isset($tokens[$i+1]) && $tokens[$i+1] == '(') {
                         // variable function call
-                        $this->_syntax_error("variable function call '$token' not allowed in if statement", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error("variable function call '$token' not allowed in if statement");
                     } elseif(preg_match('~^' . $this->_obj_call_regexp . '|' . $this->_var_regexp . '(?:' . $this->_mod_regexp . '*)$~', $token)) {
                         // object or variable
                         $token = $this->_parse_var_props($token);
                     } elseif(is_numeric($token)) {
                         // number, skip it
                     } else {
-                        $this->_syntax_error("unidentified token '$token'", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error("unidentified token '$token'");
                     }
                     break;
             }
@@ -1411,12 +1416,12 @@ class Compiler extends Engine
                     $expr_arg = $tokens[$expr_end++];
                     $expr = "!($is_arg % " . $this->_parse_var_props($expr_arg) . ")";
                 } else {
-                    $this->_syntax_error("expecting 'by' after 'div'", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->_syntax_error("expecting 'by' after 'div'");
                 }
                 break;
 
             default:
-                $this->_syntax_error("unknown 'is' expression - '$expr_type'", E_USER_ERROR, __FILE__, __LINE__);
+                $this->_syntax_error("unknown 'is' expression - '$expr_type'");
                 break;
         }
 
@@ -1462,7 +1467,7 @@ class Compiler extends Engine
                         $attr_name = $token;
                         $state = 1;
                     } else
-                        $this->_syntax_error("invalid attribute name: '$token'", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error("invalid attribute name: '$token'");
                     break;
 
                 case 1:
@@ -1470,7 +1475,7 @@ class Compiler extends Engine
                     if ($token == '=') {
                         $state = 2;
                     } else
-                        $this->_syntax_error("expecting '=' after attribute name '$last_token'", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error("expecting '=' after attribute name '$last_token'");
                     break;
 
                 case 2:
@@ -1495,7 +1500,7 @@ class Compiler extends Engine
                         $attrs[$attr_name] = $token;
                         $state = 0;
                     } else
-                        $this->_syntax_error("'=' cannot be an attribute value", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error("'=' cannot be an attribute value");
                     break;
             }
             $last_token = $token;
@@ -1503,9 +1508,9 @@ class Compiler extends Engine
 
         if($state != 0) {
             if($state == 1) {
-                $this->_syntax_error("expecting '=' after attribute name '$last_token'", E_USER_ERROR, __FILE__, __LINE__);
+                $this->_syntax_error("expecting '=' after attribute name '$last_token'");
             } else {
-                $this->_syntax_error("missing attribute value", E_USER_ERROR, __FILE__, __LINE__);
+                $this->_syntax_error("missing attribute value");
             }
         }
 
@@ -1726,12 +1731,12 @@ class Compiler extends Engine
                         $_output .= "['" . substr($_index, 1) . "']";
                 } else if (substr($_index,0,2) == '->') {
                     if(substr($_index,2,2) == '__') {
-                        $this->_syntax_error('call to internal object members is not allowed', E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error('call to internal object members is not allowed');
                     } elseif($this->security && substr($_index, 2, 1) == '_') {
-                        $this->_syntax_error('(secure) call to private object member is not allowed', E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_syntax_error('(secure) call to private object member is not allowed');
                     } elseif (substr($_index, 2, 1) == '$') {
                         if ($this->security) {
-                            $this->_syntax_error('(secure) call to dynamic object member is not allowed', E_USER_ERROR, __FILE__, __LINE__);
+                            $this->_syntax_error('(secure) call to dynamic object member is not allowed');
                         } else {
                             $_output .= '->{(($_var=$this->_tpl_vars[\''.substr($_index,3).'\']) && substr($_var,0,2)!=\'__\') ? $_var : $this->trigger_error("cannot access property \\"$_var\\"")}';
                         }
@@ -1913,7 +1918,7 @@ class Compiler extends Engine
         $_ref = substr($indexes[0], 1);
         foreach($indexes as $_index_no=>$_index) {
             if (substr($_index, 0, 1) != '.' && $_index_no<2 || !preg_match('~^(\.|\[|->)~', $_index)) {
-                $this->_syntax_error('$smarty' . implode('', array_slice($indexes, 0, 2)) . ' is an invalid reference', E_USER_ERROR, __FILE__, __LINE__);
+                $this->_syntax_error('$smarty' . implode('', array_slice($indexes, 0, 2)) . ' is an invalid reference');
             }
         }
 
@@ -2073,12 +2078,12 @@ class Compiler extends Engine
                 break;
 
             default:
-                $this->_syntax_error('$smarty.' . $_ref . ' is an unknown reference', E_USER_ERROR, __FILE__, __LINE__);
+                $this->_syntax_error('$smarty.' . $_ref . ' is an unknown reference');
                 break;
         }
 
         if (isset($_max_index) && count($indexes) > $_max_index) {
-            $this->_syntax_error('$smarty' . implode('', $indexes) .' is an invalid reference', E_USER_ERROR, __FILE__, __LINE__);
+            $this->_syntax_error('$smarty' . implode('', $indexes) .' is an invalid reference');
         }
 
         array_shift($indexes);
@@ -2153,18 +2158,36 @@ class Compiler extends Engine
         return strtr($string, array('\\' => '\\\\', '$' => '\\$'));
     }
 
-    /**
-     * display Smarty syntax error
-     *
-     * @param string $error_msg
-     * @param integer $error_type
-     * @param string $file
-     * @param integer $line
-     */
-    function _syntax_error($error_msg, $error_type = E_USER_ERROR, $file=null, $line=null)
-    {
-        $this->_trigger_fatal_error("syntax error: $error_msg", $this->_current_file, $this->_current_line_no, $file, $line, $error_type);
-    }
+        /**
+        * display smarty syntax error
+        *
+        * @param string $error_msg
+        * @param integer $error_type
+        * @param string $file
+        * @param integer $line
+        *
+        * @throws BadSyntaxException
+        */
+        function _syntax_error($error_msg, $error_type = E_USER_ERROR, $file=null, $line=null)
+        {
+                if (E_USER_ERROR === $error_type)
+                {
+                        throw new BadSyntaxException(
+                                $error_msg,
+                                $this->_current_file,
+                                $this->_current_line_no
+                        );
+                }
+
+                $this->_trigger_fatal_error(
+                        "syntax error: $error_msg",
+                        $this->_current_file,
+                        $this->_current_line_no,
+                        $file,
+                        $line,
+                        $error_type
+                        );
+        }
 
 
         /**
@@ -2226,8 +2249,7 @@ class Compiler extends Engine
             }
             $message = " expected {/$_open_tag} (opened line $_line_no).";
         }
-        $this->_syntax_error("mismatched tag {/$close_tag}.$message",
-                             E_USER_ERROR, __FILE__, __LINE__);
+        $this->_syntax_error("mismatched tag {/$close_tag}.$message");
     }
 
     /**
