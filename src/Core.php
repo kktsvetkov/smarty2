@@ -107,57 +107,6 @@ class Core
         }
 
         /**
-         * Retrieves PHP script resource
-         *
-         * Sets $php_resource to the returned resource
-         *
-         * @param string $resource
-         * @param string $resource_type
-         * @param mixed $php_resource
-         * @return boolean
-         */
-        static function get_php_resource(&$params, &$smarty)
-        {
-            $params['resource_base_path'] = array();
-            $smarty->_parse_resource_name($params, $smarty);
-
-            /*
-             * Find out if the resource exists.
-             */
-
-            if ($params['resource_type'] == 'file') {
-                $_readable = false;
-                if(file_exists($params['resource_name']) && is_readable($params['resource_name'])) {
-                    $_readable = true;
-                }
-            } else if ($params['resource_type'] != 'file') {
-                $_template_source = null;
-                $_readable = is_callable($smarty->_plugins['resource'][$params['resource_type']][0][0])
-                    && call_user_func_array($smarty->_plugins['resource'][$params['resource_type']][0][0],
-                                            array($params['resource_name'], &$_template_source, &$smarty));
-            }
-
-
-            if (!$_readable)
-            {
-                $smarty->trigger_error(
-                        $params['resource_type'] . ':'
-                                . $params['resource_name']
-                                . ' is not readable'
-                        );
-                return false;
-            }
-
-            if ($params['resource_type'] == 'file') {
-                $params['php_resource'] = $params['resource_name'];
-            } else {
-                $params['php_resource'] = $_template_source;
-            }
-            return true;
-        }
-
-
-        /**
          * Load requested plugins
          *
          * @param array $plugins
@@ -355,35 +304,11 @@ class Core
                         $_debug_start_time = microtime(true);
                 }
 
-                if (isset($params['args']['script']))
-                {
-                        $_params = array(
-                                'resource_name' => $smarty->_dequote($params['args']['script'])
-                                );
-
-                        if(!self::get_php_resource($_params, $smarty))
-                        {
-                                return false;
-                        }
-
-                        if ($_params['resource_type'] == 'file')
-                        {
-                                $smarty->_include($_params['php_resource'], true);
-                        } else
-                        {
-                                $smarty->_eval($_params['php_resource']);
-                        }
-
-                        unset($params['args']['script']);
-                }
-
                 $_funcname = $smarty->_plugins['insert'][$params['args']['name']][0];
                 $_content = $_funcname($params['args'], $smarty);
 
                 if ($smarty->debugging)
                 {
-                        $_params = array();
-
                         $smarty->_smarty_debug_info[] = array(
                                 'type'      => 'insert',
                                 'filename'  => 'insert_'.$params['args']['name'],
@@ -395,10 +320,10 @@ class Core
                 if (!empty($params['args']["assign"]))
                 {
                         $smarty->assign($params['args']["assign"], $_content);
-                } else
-                {
-                        return $_content;
+                        return '';
                 }
+
+                return $_content;
         }
 
         /**
