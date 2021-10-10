@@ -999,7 +999,7 @@ class Engine
         {
                 if (!is_dir($compiled_dir))
                 {
-                        $smarty->trigger_error(
+                        $this->trigger_error(
                                 "Compiled templates folder '{$compiled_dir}' does not exist, or is not a folder.",
                                 E_USER_ERROR);
                         return false;
@@ -1014,7 +1014,7 @@ class Engine
                                         : '';
                         }
 
-                        $smarty->trigger_error(
+                        $this->trigger_error(
                                 "Compiled templates folder '{$compiled_dir}' is not writable {$real_dir}",
                                 E_USER_ERROR);
                         return false;
