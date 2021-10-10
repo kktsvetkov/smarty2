@@ -130,6 +130,13 @@ It goes without saying how bad of an idea is to use the `{php}` block tags.
 Now all of those tags will be stripped when the template is compiled. The
 `PHP_TAGS` security option is also removed as it is no longer needed.
 
+## {include_php} tag
+
+Again, including PHP scripts from templates is a bad ideas. Another option that
+made this possible was the `{include_php}` tag. That is now removed from this
+project. If you do need to use this tag, look into implementing your own custom
+plugin functions for this.
+
 ## What is Smarty?
 
 *(from original README)*
