@@ -2096,7 +2096,7 @@ class Compiler extends Engine
                 if ($prefilter === false) {
                     unset($this->_plugins['prefilter'][$filter_name]);
                     $_params = array('plugins' => array(array('prefilter', $filter_name, null, null, false)));
-                    \Smarty\Core::load_plugins($_params, $this);
+                    \Smarty2\Core::load_plugins($_params, $this);
                 }
             }
         }
@@ -2105,7 +2105,7 @@ class Compiler extends Engine
                 if ($postfilter === false) {
                     unset($this->_plugins['postfilter'][$filter_name]);
                     $_params = array('plugins' => array(array('postfilter', $filter_name, null, null, false)));
-                    \Smarty\Core::load_plugins($_params, $this);
+                    \Smarty2\Core::load_plugins($_params, $this);
                 }
             }
         }
