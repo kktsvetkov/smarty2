@@ -104,7 +104,7 @@ and do nothing.
 Consider other options for caching for your web app, not within the
 presentation layer that Smarty provides.
 
-## Internals (from libs/internals)
+## Core Internals (from libs/internals)
 
 The `libs/internals` folder is removed from the project. All of the core
 internals are moved as methods to the `Smarty_Core` class, which eventually
