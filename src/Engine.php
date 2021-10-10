@@ -998,27 +998,30 @@ class Engine
         * @throws Smarty2\Exception\FilepathException
         */
         protected function inspect_compiled_dir(string $compiled_dir)
-        { 
+        {
                 if (!is_dir($compiled_dir))
                 {
-                        throw new FilepathException(
-                                "Compiled templates folder '{$compiled_dir}' "
-                                        . "does not exist, or is not a folder;",
-                                $compiled_dir
-                                );
+                        if (is_file($compiled_dir))
+                        {
+                                throw new FilepathException(
+                                        "Compiled templates folder '{$compiled_dir}' is not a folder;",
+                                        $compiled_dir
+                                        );
+                        }
+
+                        if (false === mkdir($compiled_dir, $this->_dir_perms, true))
+                        {
+                                throw new FilepathException(
+                                        "Compiled templates folder '{$compiled_dir}' can not be created;",
+                                        $compiled_dir
+                                        );
+                        }
                 }
 
                 if (!is_writable($compiled_dir))
                 {
-                        if ($real_dir = realpath($compiled_dir))
-                        {
-                                $real_dir = ($real_dir != $compiled_dir)
-                                        ? "({$real_dir})"
-                                        : '';
-                        }
-
                         throw new FilepathException(
-                                "Compiled templates folder '{$compiled_dir}' is not writable {$real_dir}",
+                                "Compiled templates folder '{$compiled_dir}' is not writable",
                                 $compiled_dir
                                 );
                 }
