@@ -298,39 +298,6 @@ class Core
         }
 
         /**
-         * write the compiled resource
-         *
-         * @param string $compile_path
-         * @param string $compiled_content
-         * @return boolean
-         */
-        static function write_compiled_resource($params, &$smarty)
-        {
-                if (!is_dir($smarty->compile_dir))
-                {
-                        $smarty->trigger_error(
-                                'the $compile_dir \''
-                                        . $smarty->compile_dir
-                                        . '\' does not exist, or is not a directory.',
-                                E_USER_ERROR);
-                        return false;
-                }
-
-            if (!is_writable($smarty->compile_dir))
-            {
-                $smarty->trigger_error(
-                        'unable to write to $compile_dir \''
-                                . realpath($smarty->compile_dir)
-                                . '\'. Be sure $compile_dir is writable by the web server user.',
-                        E_USER_ERROR);
-                return false;
-            }
-
-            self::write_file($params['compile_path'], $params['compiled_content'], $smarty);
-            return true;
-        }
-
-        /**
         * write out a file to disk
         *
         * @param string $filename

@@ -945,37 +945,83 @@ class Engine
                 return false;
         }
 
-   /**
-     * compile the template
-     *
-     * @param string $resource_name
-     * @param string $compile_path
-     * @return boolean
-     */
-    function _compile_resource($resource_name, $compile_path)
-    {
+        /**
+        * compile the template
+        *
+        * @param string $resource_name
+        * @param string $compile_path
+        * @return boolean
+        */
+        function _compile_resource($resource_name, $compile_path)
+        {
+                $_params = array('resource_name' => $resource_name);
+                if (!$this->_fetch_resource_info($_params))
+                {
+                        return false;
+                }
 
-        $_params = array('resource_name' => $resource_name);
-        if (!$this->_fetch_resource_info($_params)) {
-            return false;
+                $_source_content = $_params['source_content'];
+
+                if ($this->_compile_source(
+                        $resource_name,
+                        $_source_content,
+                        $_compiled_content))
+                {
+                        if (!isset($this->compiled_dir_inspected))
+                        {
+                                $this->compiled_dir_inspected = true;
+                                $this->inspect_compiled_dir($this->compile_dir);
+                        }
+
+                        return \Smarty2\Core::write_file(
+                                $compile_path,
+                                $_compiled_content,
+                                $this
+                                );
+                }
+
+                return false;
         }
 
-        $_source_content = $_params['source_content'];
+        /**
+        * @var boolean flag whether {$smarty->compiled_dir} was inspected
+        * @see Smarty2\Engine::inspect_compiled_dir()
+        */
+        protected bool $compiled_dir_inspected;
 
-        if ($this->_compile_source($resource_name, $_source_content, $_compiled_content)) {
+        /**
+        * Inspect that the {$smarty->compiled_dir} exists and is writable
+        *
+        * @param string $compiled_dir
+        * @return boolean
+        */
+        protected function inspect_compiled_dir(string $compiled_dir) : bool
+        {
+                if (!is_dir($compiled_dir))
+                {
+                        $smarty->trigger_error(
+                                "Compiled templates folder '{$compiled_dir}' does not exist, or is not a folder.",
+                                E_USER_ERROR);
+                        return false;
+                }
 
-            $_params = array(
-                'compile_path'=>$compile_path,
-                'compiled_content' => $_compiled_content
-                );
-            \Smarty2\Core::write_compiled_resource($_params, $this);
+                if (!is_writable($compiled_dir))
+                {
+                        if ($real_dir = realpath($compiled_dir))
+                        {
+                                $real_dir = ($real_dir != $compiled_dir)
+                                        ? "({$real_dir})"
+                                        : '';
+                        }
 
-            return true;
-        } else {
-            return false;
+                        $smarty->trigger_error(
+                                "Compiled templates folder '{$compiled_dir}' is not writable {$real_dir}",
+                                E_USER_ERROR);
+                        return false;
+                }
+
+                return true;
         }
-
-    }
 
    /**
      * compile the given source
