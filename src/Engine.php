@@ -662,16 +662,14 @@ class Engine
     }
 
     /**
-     * clears compiled version of specified template resource,
-     * or all compiled template files if one is not specified.
-     * This function is for advanced use only, not normally needed.
+     * clears compiled version of specified template resource
      *
      * @param string $tpl_file
      * @param string $compile_id
      * @param string $exp_time
      * @return boolean results of {@link \Smarty2\Core::unlink()}
      */
-    function clear_compiled_tpl($tpl_file = null, $compile_id = null, $exp_time = null)
+    function clear_compiled_tpl($tpl_file, $compile_id = null, $exp_time = null)
     {
         $smarty_compile_tpl = $this->_get_compile_path($tpl_file, $compile_id);
         return \Smarty2\Core::unlink($smarty_compile_tpl, $exp_time);
