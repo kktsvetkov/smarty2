@@ -188,6 +188,7 @@ code around them.
 * `{html_image}` -- there are better ways to do this
 * `{config_load}` -- the whole config file reading feature is removed
 * `{debug}` -- the debug console is removed
+* `{popup}`, `{popup_init}` -- seriously ?
 
 #### Removed Features
 
