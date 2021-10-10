@@ -326,59 +326,39 @@ class Core
                 return false;
             }
 
-            $_params = array(
-                    'filename' => $params['compile_path'],
-                    'contents' => $params['compiled_content']
-                    );
-
-            self::write_file($_params, $smarty);
+            self::write_file($params['compile_path'], $params['compiled_content'], $smarty);
             return true;
         }
 
         /**
-         * write out a file to disk
-         *
-         * @param string $filename
-         * @param string $contents
-         * @return boolean
-         */
-        static function write_file($params, &$smarty)
+        * write out a file to disk
+        *
+        * @param string $filename
+        * @param string $contents
+        * @return boolean
+        */
+        static function write_file(string $filename, string $contents, &$smarty)
         {
-            $_dirname = dirname($params['filename']);
-
-            if (!is_dir($_dirname))
-            {
-                    if (false === mkdir($_dirname, $smarty->_dir_perms, true))
-                    {
-                            $smarty->trigger_error("problem creating folder '{$_dirname}'");
-                            return false;
-                    }
-            }
-
-            // write to tmp file, then rename it to avoid file locking race condition
-            $_tmp_file = tempnam($_dirname, 'wrt');
-
-            if (!($fd = @fopen($_tmp_file, 'wb'))) {
-                $_tmp_file = $_dirname . DIRECTORY_SEPARATOR . uniqid('wrt');
-                if (!($fd = @fopen($_tmp_file, 'wb'))) {
-                    $smarty->trigger_error("problem writing temporary file '$_tmp_file'");
-                    return false;
+                $folder = dirname($filename);
+                if (!is_dir($folder))
+                {
+                        if (false === mkdir($folder, $smarty->_dir_perms, true))
+                        {
+                                $smarty->trigger_error("problem creating folder '{$folder}'");
+                                return false;
+                        }
                 }
-            }
 
-            fwrite($fd, $params['contents']);
-            fclose($fd);
+                $saved = file_put_contents($filename, $contents, LOCK_EX);
 
-            if (DIRECTORY_SEPARATOR == '\\' || !@rename($_tmp_file, $params['filename'])) {
-                // On platforms and filesystems that cannot overwrite with rename()
-                // delete the file before renaming it -- because windows always suffers
-                // this, it is short-circuited to avoid the initial rename() attempt
-                @unlink($params['filename']);
-                @rename($_tmp_file, $params['filename']);
-            }
-            @chmod($params['filename'], $smarty->_file_perms);
+                if (false === $saved)
+                {
+                        $smarty->trigger_error("problem writing file '{$filename}'");
+                        return false;
+                }
 
-            return true;
+                chmod($filename, $smarty->_file_perms);
+                return true;
         }
 
         /**
