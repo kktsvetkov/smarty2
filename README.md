@@ -48,7 +48,45 @@ The project was converted to use a PSR-4 loaded namespace called `Smarty2`.
 The legacy class names of `Smarty` and `Smarty_Compiler` are still available
 as aliased to their descendants at `Smarty2\Engine` and `Smarty2\Compiler`.
 
-## Debugging
+## What is Smarty?
+
+*(from original README)*
+
+Smarty is a template engine for PHP. Many other template engines for PHP
+provide basic variable substitution and dynamic block functionality.
+Smarty takes a step further to be a "smart" template engine, adding
+features such as configuration files, template functions, and variable
+modifiers, and making all of this functionality as easy as possible to
+use for both programmers and template designers. Smarty also converts
+the templates into PHP scripts, eliminating the need to parse the
+templates on every invocation. This makes Smarty extremely scalable and
+manageable for large application needs.
+
+Some of Smarty's features:
+
+* it is extremely fast
+* no template parsing overhead, only compiles once.
+    * it is smart about recompiling only the template files that have
+      changed.
+* the template language is remarkably extensible via the plugin
+  architecture.
+* configurable template delimiter tag syntax, so you can use
+  `{}`, `{{}}`, `<!--{}-->`, or whatever you like.
+* arbitrary template sources (filesystem, databases, etc.)
+* template if/elseif/else/endif constructs are passed to the PHP parser,
+  so the if syntax can be as simple or as complex as you like.
+* unlimited nesting of sections, conditionals, etc. allowed
+* it is possible to embed PHP code right in your template files,
+  although not recommended and doubtfully needed since the engine
+  is so customizable.
+* and many more.
+
+## Dropped or Deprecated Features
+
+One of the goals for this project is to cut down any dated or legacy features,
+as well as exotic and questionable features that have outlived their purpose.
+
+#### Debugging
 
 The debugging console is removed. The debugging stats are collected in
 the `Smarty::$_smarty_debug_info` array, and you can inspect and render
@@ -90,12 +128,12 @@ Array
 )
 ```
 
-## Config Vars
+#### Config Vars
 
 The config file reading is removed. In order to introduce config_vars use
 the `Smarty::set_config_vars()` method instead.
 
-## Caching
+#### Caching
 
 The built-in caching of the Smarty 2 project is removed from this fork. The
 methods used in caching are still present, but they are considered deprecated
@@ -104,68 +142,54 @@ and do nothing.
 Consider other options for caching for your web app, not within the
 presentation layer that Smarty provides.
 
-## Core Internals (from libs/internals)
+#### Core Internals (from libs/internals)
 
 The `libs/internals` folder is removed from the project. All of the core
 internals are moved as methods to the `Smarty_Core` class, which eventually
 became the `Smarty2\Core` class.
 
-## Plugins (from libs/plugins)
+#### Plugins (from libs/plugins)
 
 As the project was converted to using PSR-4 loaded namespace, the `libs/` folder
 was dropped. The core project files are moved to `src/`, and the `plugins/`
 folder is moved to the root. The `SMARTY_DIR` used to load the plugins is adjusted
 accordingly to point to the correct folder.
 
-## PHP_HANDLING
+#### PHP_HANDLING
 
 Any PHP code a la `<?php do_something(); ?>` inside the templates will always
 be printed in the template in its quoted form. This is the behaviour that used
 to be triggered by the `SMARTY_PHP_QUOTE` setting of `$smarty->php_handling`.
 Now that's the only available option.
 
-## {php} block tags
+#### {php} block tags
 
 It goes without saying how bad of an idea is to use the `{php}` block tags.
 Now all of those tags will be stripped when the template is compiled. The
 `PHP_TAGS` security option is also removed as it is no longer needed.
 
-## {include_php} tag
+#### {include_php} tag
 
 Again, including PHP scripts from templates is a bad ideas. Another option that
 made this possible was the `{include_php}` tag. That is now removed from this
 project. If you do need to use this tag, look into implementing your own custom
 plugin functions for this.
 
-## What is Smarty?
+#### Dropped Plugins
 
-*(from original README)*
+These plugins have been removed from this project. If you need them for your
+work you can either get them from the original source code at [**Smarty 2.6.31**](https://github.com/smarty-php/smarty/tree/v2.6.31) and add them as custom plugins, or you can modify your
+code around them.
 
-Smarty is a template engine for PHP. Many other template engines for PHP
-provide basic variable substitution and dynamic block functionality.
-Smarty takes a step further to be a "smart" template engine, adding
-features such as configuration files, template functions, and variable
-modifiers, and making all of this functionality as easy as possible to
-use for both programmers and template designers. Smarty also converts
-the templates into PHP scripts, eliminating the need to parse the
-templates on every invocation. This makes Smarty extremely scalable and
-manageable for large application needs.
+* `{mailto}` -- 2002 called and asked for it back  
+* `{fetch}` -- it is a bad idea to fetch anything during rendering
+* `{html_image}` -- there are better ways to do this
+* `{config_load}` -- the whole config file reading feature is removed
+* `{debug}` -- the debug console is removed
 
-Some of Smarty's features:
+#### Removed Features
 
-* it is extremely fast
-* no template parsing overhead, only compiles once.
-    * it is smart about recompiling only the template files that have
-      changed.
-* the template language is remarkably extensible via the plugin
-  architecture.
-* configurable template delimiter tag syntax, so you can use
-  `{}`, `{{}}`, `<!--{}-->`, or whatever you like.
-* arbitrary template sources (filesystem, databases, etc.)
-* template if/elseif/else/endif constructs are passed to the PHP parser,
-  so the if syntax can be as simple or as complex as you like.
-* unlimited nesting of sections, conditionals, etc. allowed
-* it is possible to embed PHP code right in your template files,
-  although not recommended and doubtfully needed since the engine
-  is so customizable.
-* and many more.
+Few more things stripped form this project:
+
+- the `append="..."` argument for `{capture}` block tags
+- the `script="..."` argument for `{insert}` tags
