@@ -2,6 +2,8 @@
 
 namespace Smarty2;
 
+use Smarty2\Exception\FilepathException;
+
 /**
 * Smarty2 - the PHP template engine
 *
@@ -993,16 +995,17 @@ class Engine
         * Inspect that the {$smarty->compiled_dir} exists and is writable
         *
         * @param string $compiled_dir
-        * @return boolean
+        * @throws Smarty2\Exception\FilepathException
         */
-        protected function inspect_compiled_dir(string $compiled_dir) : bool
-        {
+        protected function inspect_compiled_dir(string $compiled_dir)
+        { 
                 if (!is_dir($compiled_dir))
                 {
-                        $this->trigger_error(
-                                "Compiled templates folder '{$compiled_dir}' does not exist, or is not a folder.",
-                                E_USER_ERROR);
-                        return false;
+                        throw new FilepathException(
+                                "Compiled templates folder '{$compiled_dir}' "
+                                        . "does not exist, or is not a folder;",
+                                $compiled_dir
+                                );
                 }
 
                 if (!is_writable($compiled_dir))
@@ -1014,13 +1017,11 @@ class Engine
                                         : '';
                         }
 
-                        $this->trigger_error(
+                        throw new FilepathException(
                                 "Compiled templates folder '{$compiled_dir}' is not writable {$real_dir}",
-                                E_USER_ERROR);
-                        return false;
+                                $compiled_dir
+                                );
                 }
-
-                return true;
         }
 
    /**
