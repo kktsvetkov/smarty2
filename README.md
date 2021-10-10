@@ -1,3 +1,5 @@
+[![Smarty 2](https://repository-images.githubusercontent.com/414840734/351f0ce4-ef36-4b8c-a8b4-80ef843d58d8)](https://github.com/kktsvetkov/smarty2)
+
 # Smarty 2 - the PHP compiling template engine
 
 The **Smarty 2** library is still used, even 20 years after its initial
