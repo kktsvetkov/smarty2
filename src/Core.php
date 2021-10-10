@@ -137,17 +137,14 @@ class Core
                                             array($params['resource_name'], &$_template_source, &$smarty));
             }
 
-            /*
-             * Set the error function, depending on which class calls us.
-             */
-            if (method_exists($smarty, '_syntax_error')) {
-                $_error_funcc = '_syntax_error';
-            } else {
-                $_error_funcc = 'trigger_error';
-            }
 
-            if (!$_readable) {
-                $smarty->$_error_funcc($params['resource_type'] . ':' . $params['resource_name'] . ' is not readable');
+            if (!$_readable)
+            {
+                $smarty->trigger_error(
+                        $params['resource_type'] . ':'
+                                . $params['resource_name']
+                                . ' is not readable'
+                        );
                 return false;
             }
 
