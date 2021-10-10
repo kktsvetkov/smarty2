@@ -1337,7 +1337,7 @@ class Engine
         * @param callback $function
         * @return string
         */
-        protected function _get_filter_name(string $function) : string
+        protected function _get_filter_name(callable $function) : string
         {
                 if (is_array($function))
                 {
