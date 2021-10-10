@@ -407,9 +407,6 @@ class Compiler extends Engine
             case 'include':
                 return $this->_compile_include_tag($tag_args);
 
-            case 'include_php':
-                return $this->_compile_include_php_tag($tag_args);
-
             case 'if':
                 $this->_push_tag('if');
                 return $this->_compile_if_tag($tag_args);
@@ -955,38 +952,6 @@ class Compiler extends Engine
         return $output;
 
     }
-
-    /**
-     * Compile {include ...} tag
-     *
-     * @param string $tag_args
-     * @return string
-     */
-    function _compile_include_php_tag($tag_args)
-    {
-        $attrs = $this->_parse_attrs($tag_args);
-
-        if (empty($attrs['file'])) {
-            $this->_syntax_error("missing 'file' attribute in include_php tag");
-        }
-
-        $assign_var = (empty($attrs['assign'])) ? '' : $this->_dequote($attrs['assign']);
-        $once_var = (empty($attrs['once']) || $attrs['once']=='false') ? 'false' : 'true';
-
-        $arg_list = array();
-        foreach($attrs as $arg_name => $arg_value) {
-            if($arg_name != 'file' AND $arg_name != 'once' AND $arg_name != 'assign') {
-                if(is_bool($arg_value))
-                    $arg_value = $arg_value ? 'true' : 'false';
-                $arg_list[] = "'$arg_name' => $arg_value";
-            }
-        }
-
-        $_params = "array('smarty_file' => " . $attrs['file'] . ", 'smarty_assign' => '$assign_var', 'smarty_once' => $once_var, 'smarty_include_vars' => array(".implode(',', $arg_list)."))";
-
-        return "<?php \Smarty2\Core::smarty_include_php($_params, \$this); ?>" . $this->_additional_newline;
-    }
-
 
     /**
      * Compile {section ...} tag
