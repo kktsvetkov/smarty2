@@ -95,11 +95,11 @@ class VarsTest extends TestCase
 			'Array'
 			);
 
-		// $this->smarty->assign('foo', new \stdClass);
-		// $this->assertEquals(
-		// 	$this->smarty->fetch('AssignTemplateVars.tpl'),
-		// 	'stdClass'
-		// 	);
+		$this->smarty->assign('foo', new \stdClass);
+		$this->assertEquals(
+			$this->smarty->fetch('AssignTemplateVars.tpl'),
+			''
+			);
 
 		$this->smarty->assign('foo', new class()
 		{
