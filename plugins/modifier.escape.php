@@ -42,6 +42,11 @@ function smarty_modifier_escape($subject, $esc_type = 'html', $char_set = 'ISO-8
         }
 
         $subject = (string) $subject;
+        if (!$subject)
+        {
+                return '';
+        }
+
         switch ($esc_type)
         {
                 case 'html':
