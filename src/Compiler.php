@@ -881,11 +881,7 @@ class Compiler extends Engine
 	    return $this->_syntax_error("'insert: 'name' must be an insert function name");
 	}
 
-	if (!empty($attrs['script'])) {
-	    $delayed_loading = true;
-	} else {
-	    $delayed_loading = false;
-	}
+	$delayed_loading = false;
 
 	foreach ($attrs as $arg_name => $arg_value) {
 	    if (is_bool($arg_value))
