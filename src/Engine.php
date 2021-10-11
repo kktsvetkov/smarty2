@@ -246,20 +246,6 @@ class Engine
     var $_smarty_debug_info    = array();
 
     /**
-     * default file permissions
-     *
-     * @var integer
-     */
-    var $_file_perms	   = 0644;
-
-    /**
-     * default dir permissions
-     *
-     * @var integer
-     */
-    var $_dir_perms	       = 0771;
-
-    /**
      * registered objects
      *
      * @var array
