@@ -197,41 +197,6 @@ class Core
 	}
 
 	/**
-	 * Handle insert tags
-	 *
-	 * @param array $args
-	 * @return string
-	 */
-	static function run_insert_handler($params, &$smarty)
-	{
-		if ($smarty->debugging)
-		{
-			$_debug_start_time = microtime(true);
-		}
-
-		$_funcname = $smarty->_plugins['insert'][$params['args']['name']][0];
-		$_content = $_funcname($params['args'], $smarty);
-
-		if ($smarty->debugging)
-		{
-			$smarty->_smarty_debug_info[] = array(
-				'type'      => 'insert',
-				'filename'  => 'insert_'.$params['args']['name'],
-				'depth'     => $smarty->_inclusion_depth,
-				'exec_time' => microtime(true) - $_debug_start_time
-			);
-		}
-
-		if (!empty($params['args']["assign"]))
-		{
-			$smarty->assign($params['args']["assign"], $_content);
-			return '';
-		}
-
-		return $_content;
-	}
-
-	/**
 	* Always returns a string for what is inside $subject
 	*
 	* @param mixed $subject

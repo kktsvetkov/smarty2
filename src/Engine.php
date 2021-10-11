@@ -1401,6 +1401,41 @@ class Engine
 		return $function;
 	}
 
+	/**
+	* Handle insert tags
+	*
+	* @param array $params
+	* @return string
+	*/
+	protected function _run_insert_handler($params)
+	{
+		if ($this->debugging)
+		{
+			$_debug_start_time = microtime(true);
+		}
+
+		$_funcname = $this->_plugins['insert'][$params['args']['name']][0];
+		$_content = $_funcname($params['args'], $this);
+
+		if ($this->debugging)
+		{
+			$this->_smarty_debug_info[] = array(
+				'type'      => 'insert',
+				'filename'  => 'insert_'.$params['args']['name'],
+				'depth'     => $this->_inclusion_depth,
+				'exec_time' => microtime(true) - $_debug_start_time
+			);
+		}
+
+		if (!empty($params['args']["assign"]))
+		{
+			$this->assign($params['args']["assign"], $_content);
+			return '';
+		}
+
+		return $_content;
+	}
+
 	/**#@+
 	* Deprecated Methods Section
 	*/

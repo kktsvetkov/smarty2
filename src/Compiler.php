@@ -897,7 +897,7 @@ class Compiler extends Engine
 
 	$_params = "array('args' => array(".implode(', ', (array)$arg_list)."))";
 
-	return "<?php echo \Smarty2\Core::run_insert_handler($_params, \$this); ?>"
+	return "<?php echo \$this->_run_insert_handler({$_params}); ?>"
 		. $this->_additional_newline;
     }
 
