@@ -11,6 +11,8 @@ use Smarty2\Exception\FilepathException;
 */
 class Engine
 {
+	use Engine\ConfigVarsTrait;
+
 	/**
 	* Smarty version number
 	*
@@ -221,13 +223,6 @@ class Engine
      * @var array
      */
     var $_tag_stack	    = array();
-
-    /**
-     * loaded configuration settings
-     *
-     * @var array
-     */
-    var $_config = array();
 
     /**
      * current template inclusion depth
@@ -703,49 +698,6 @@ class Engine
     }
 
     /**
-     * Returns an array containing config variables
-     *
-     * @param string $name
-     * @return array
-     */
-    function get_config_vars($name=null)
-    {
-	    if (null === $name)
-	    {
-		    return $this->_config;
-	    }
-
-	    return $this->_config[$name] ?? [];
-    }
-
-	/**
-	* Introduces values as config vars
-	*
-	* @param array|string $name the config var name
-	* @param mixed $value the value to assign
-	* @return self
-	*/
-	function set_config_vars($name, $value = null)
-	{
-		if (is_array($name))
-		{
-			foreach ($name as $key => $val)
-			{
-				if ($key != '')
-				{
-					$this->_config[$key] = $val;
-				}
-			}
-		} else
-		if ($name != '')
-		{
-			$this->_config[$name] = $value;
-		}
-
-		return $this;
-	}
-
-    /**
      * trigger Smarty error
      *
      * @param string $error_msg
@@ -862,22 +814,6 @@ class Engine
 	$this->_trigger_fatal_error("registered '$name' is not an object");
 
 	return $this->_reg_objects[$name][0];
-    }
-
-    /**
-     * clear configuration values
-     *
-     * @param string $var
-     */
-    function clear_config($var = null)
-    {
-	if(null === $var)
-	{
-	    // clear all values
-	    $this->_config = array();
-	} else {
-	    unset($this->_config[$var]);
-	}
     }
 
 	/**
