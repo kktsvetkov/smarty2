@@ -2,6 +2,8 @@
 
 namespace Smarty2;
 
+use Smarty2\Exception\FilepathException;
+
 /**
 * Collection of Smarty core operations
 *
@@ -229,6 +231,7 @@ class Core
 	* @param string $filename
 	* @param string $contents
 	* @return boolean
+	* @throws FilepathException
 	*/
 	static function write_file(string $filename, string $contents, &$smarty)
 	{
@@ -237,17 +240,28 @@ class Core
 		{
 			if (false === mkdir($folder, $smarty->_dir_perms, true))
 			{
-				$smarty->trigger_error("problem creating folder '{$folder}'");
-				return false;
+				throw new FilepathException(
+					"Failed to create folder '{$folder}'",
+					$folder
+					);
 			}
 		}
 
-		$saved = file_put_contents($filename, $contents, LOCK_EX);
-
-		if (false === $saved)
+		$tmp = tempnam($folder, basename($filename));
+		if (false === file_put_contents($tmp, $contents, LOCK_EX))
 		{
-			$smarty->trigger_error("problem writing file '{$filename}'");
-			return false;
+			throw new FilepathException(
+				"Failed to write temporary file '{$tmp}'",
+				$tmp
+				);
+		}
+
+		if (false === rename($tmp, $filename))
+		{
+			throw new FilepathException(
+				"Failed to write file '{$filename}'",
+				$filename
+				);
 		}
 
 		chmod($filename, $smarty->_file_perms);
