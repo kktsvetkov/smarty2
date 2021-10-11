@@ -169,7 +169,8 @@ class Core
 	    $_plugin_file = $smarty->_get_plugin_filepath('resource', $type);
 	    $_found = ($_plugin_file != false);
 
-	    if ($_found) {
+	    if ($_found)
+	    {
 		 /*
 		 * If the plugin file is found, it -must- provide the properly named
 		 * plugin functions.
