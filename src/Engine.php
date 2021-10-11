@@ -907,6 +907,21 @@ class Engine
 	}
 
 	/**
+	* @var Smarty2\Depot\LegacyDepot
+	*/
+	protected Depot\LegacyDepot $defaultCompiledDepot;
+
+	protected function getCompiledDepot() : Depot\LegacyDepot
+	{
+		return ($this->defaultCompiledDepot ??
+			$this->defaultCompiledDepot =
+				new Depot\LegacyDepot(
+					$this->compile_dir,
+					$this->use_sub_dirs
+				));
+	}
+
+	/**
 	* test if resource needs compiling
 	*
 	* @param string $resource_name
@@ -945,12 +960,9 @@ class Engine
 		}
 
 		// template not expired, no recompile
-		if ($_params['resource_timestamp'] <= filemtime($compile_path))
-		{
-			return true;
-		}
-
-		return false;
+		//
+		return ($this->getCompiledDepot()->getTimestamp($compile_path)
+			> $_params['resource_timestamp']);
 	}
 
 	/**
@@ -978,59 +990,9 @@ class Engine
 			return false;
 		}
 
-		if (!isset($this->compiled_dir_inspected))
-		{
-			$this->compiled_dir_inspected = true;
-			$this->inspect_compiled_dir($this->compile_dir);
-		}
-
-		return \Smarty2\Core::write_file(
-			$compile_path,
-			$_compiled_content,
-			$this
+		return $this->getCompiledDepot()->writeCompiled(
+			$compile_path, $_compiled_content
 			);
-	}
-
-	/**
-	* @var boolean flag whether {$smarty->compiled_dir} was inspected
-	* @see Smarty2\Engine::inspect_compiled_dir()
-	*/
-	protected bool $compiled_dir_inspected;
-
-	/**
-	* Inspect that the {$smarty->compiled_dir} exists and is writable
-	*
-	* @param string $compiled_dir
-	* @throws Smarty2\Exception\FilepathException
-	*/
-	protected function inspect_compiled_dir(string $compiled_dir)
-	{
-		if (!is_dir($compiled_dir))
-		{
-			if (is_file($compiled_dir))
-			{
-				throw new FilepathException(
-					"Compiled templates folder '{$compiled_dir}' is not a folder;",
-					$compiled_dir
-					);
-			}
-
-			if (false === mkdir($compiled_dir, $this->_dir_perms, true))
-			{
-				throw new FilepathException(
-					"Compiled templates folder '{$compiled_dir}' can not be created;",
-					$compiled_dir
-					);
-			}
-		}
-
-		if (!is_writable($compiled_dir))
-		{
-			throw new FilepathException(
-				"Compiled templates folder '{$compiled_dir}' is not writable",
-				$compiled_dir
-				);
-		}
 	}
 
    /**
@@ -1071,20 +1033,20 @@ class Engine
 	return $_results;
     }
 
-    /**
-     * Get the compile path for this resource
-     *
-     * @param string $resource_name
-     * @param string $compile_id
-     * @return string results of {@link _get_auto_filename()}
-     */
-    function _get_compile_path($resource_name, $compile_id = null)
-    {
-	return $this->_get_auto_filename(
-		$this->compile_dir,
-		$resource_name,
-		$compile_id ?? $this->compile_id) . '.php';
-    }
+	/**
+	* Get the compile path for this resource
+	*
+	* @param string $resource_name
+	* @param string $compile_id
+	* @return string
+	*/
+	function _get_compile_path($resource_name, $compile_id = null)
+	{
+	  	return $this->getCompiledDepot()->getCompiledFilename(
+			$resource_name,
+			$compile_id ?? $this->compile_id
+			);
+	}
 
     /**
      * fetch the template info. Gets timestamp, and source
@@ -1262,40 +1224,6 @@ class Engine
 	    return substr($string, 1, -1);
 	else
 	    return $string;
-    }
-
-    /**
-     * get a concrete filename for automagically created content
-     *
-     * @param string $auto_base
-     * @param string $auto_source
-     * @param string $auto_id
-     * @return string
-     */
-    function _get_auto_filename($auto_base, $auto_source = null, $auto_id = null)
-    {
-	$_compile_dir_sep =  $this->use_sub_dirs ? DIRECTORY_SEPARATOR : '^';
-	$_return = $auto_base . DIRECTORY_SEPARATOR;
-
-	if(isset($auto_id)) {
-	    // make auto_id safe for directory names
-	    $auto_id = str_replace('%7C',$_compile_dir_sep,(urlencode($auto_id)));
-	    // split into separate directories
-	    $_return .= $auto_id . $_compile_dir_sep;
-	}
-
-	if(isset($auto_source)) {
-	    // make source name safe for filename
-	    $_filename = urlencode(basename($auto_source));
-	    $_crc32 = sprintf('%08X', crc32($auto_source));
-	    // prepend %% to avoid name conflicts with
-	    // with $params['auto_id'] names
-	    $_crc32 = substr($_crc32, 0, 2) . $_compile_dir_sep .
-		      substr($_crc32, 0, 3) . $_compile_dir_sep . $_crc32;
-	    $_return .= '%%' . $_crc32 . '%%' . $_filename;
-	}
-
-	return $_return;
     }
 
     /**
