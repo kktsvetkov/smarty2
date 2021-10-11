@@ -71,11 +71,11 @@ class Legacy extends Engine
 
 	/**
 	* {@deprecated}
-	* @internal use Smarty2\Core::unlink() instead
+	* @internal use Smarty2\Kit\Files::unlink() instead
 	*/
 	function _unlink($resource, $exp_time = null)
 	{
-		return Core::unlink($resource, $exp_time);
+		return Kit\Files::unlink($resource, $exp_time);
 	}
 
 	/**#@+

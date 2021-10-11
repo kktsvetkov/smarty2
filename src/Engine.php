@@ -662,12 +662,12 @@ class Engine
      * @param string $tpl_file
      * @param string $compile_id
      * @param string $exp_time
-     * @return boolean results of {@link \Smarty2\Core::unlink()}
+     * @return boolean results of {@link \Smarty2\Kit\Files::unlink()}
      */
     function clear_compiled_tpl($tpl_file, $compile_id = null, $exp_time = null)
     {
 	$smarty_compile_tpl = $this->_get_compile_path($tpl_file, $compile_id);
-	return \Smarty2\Core::unlink($smarty_compile_tpl, $exp_time);
+	return Kit\Files::unlink($smarty_compile_tpl, $exp_time);
     }
 
     /**
