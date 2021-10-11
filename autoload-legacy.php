@@ -12,5 +12,5 @@ if (!defined('SMARTY_DIR'))
 /**
 * Create class aliases for the ones form the namespace
 */
-class_alias(Smarty2\Engine::class, 'Smarty');
+class_alias(Smarty2\Legacy::class, 'Smarty');
 class_alias(Smarty2\Compiler::class, 'Smarty_Compiler');
