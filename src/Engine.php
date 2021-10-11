@@ -12,6 +12,7 @@ use Smarty2\Exception\FilepathException;
 class Engine
 {
 	use Engine\ConfigVarsTrait;
+	use Engine\RegisteredObjectsTrait;
 
 	/**
 	* Smarty version number
@@ -246,13 +247,6 @@ class Engine
     var $_smarty_debug_info    = array();
 
     /**
-     * registered objects
-     *
-     * @var array
-     */
-    var $_reg_objects	   = array();
-
-    /**
      * table keeping track of plugins
      *
      * @var array
@@ -409,34 +403,6 @@ class Engine
     {
 	unset($this->_plugins['function'][$function]);
     }
-
-    /**
-     * Registers object to be used in templates
-     *
-     * @param string $object name of template object
-     * @param object &$object_impl the referenced PHP object to register
-     * @param null|array $allowed list of allowed methods (empty = all)
-     * @param boolean $smarty_args smarty argument format, else traditional
-     * @param null|array $block_functs list of methods that are block format
-     */
-    function register_object($object, &$object_impl, $allowed = array(), $smarty_args = true, $block_methods = array())
-    {
-	settype($allowed, 'array');
-	settype($smarty_args, 'boolean');
-	$this->_reg_objects[$object] =
-	    array(&$object_impl, $allowed, $smarty_args, $block_methods);
-    }
-
-    /**
-     * Unregisters object
-     *
-     * @param string $object name of template object
-     */
-    function unregister_object($object)
-    {
-	unset($this->_reg_objects[$object]);
-    }
-
 
     /**
      * Registers block function to be used in templates
@@ -786,21 +752,6 @@ class Engine
 	}
     }
 
-    /**
-     * return a reference to a registered object
-     *
-     * @param string $name
-     * @return object
-     */
-    function &get_registered_object($name) {
-	if (!isset($this->_reg_objects[$name]))
-	$this->_trigger_fatal_error("'$name' is not a registered object");
-
-	if (!is_object($this->_reg_objects[$name][0]))
-	$this->_trigger_fatal_error("registered '$name' is not an object");
-
-	return $this->_reg_objects[$name][0];
-    }
 
 	/**
 	* @var Smarty2\Provider\LegacyProvider
