@@ -29,9 +29,11 @@ class LegacyProvider
 	*/
 	function __construct(array $pluginDirs = null)
 	{
-		$this->pluginDirs = (null === $pluginDirs)
-			? array( SMARTY_DIR . '/plugins' )
-			: $pluginDirs;
+		$pluginDirs = $pluginDirs ?? array( SMARTY_DIR . '/plugins' );
+		foreach ($pluginDirs as $dir)
+		{
+			$this->addPluginDir($dir);
+		}
 	}
 
 	/**
