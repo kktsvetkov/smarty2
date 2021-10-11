@@ -395,7 +395,7 @@ class Compiler extends Engine
 	if (preg_match('~^' . $this->_num_const_regexp . '|' . $this->_obj_call_regexp . '|' . $this->_var_regexp . '$~', $tag_command)) {
 	    /* tag name is a variable or object */
 	    $_return = $this->_parse_var_props($tag_command . $tag_modifier);
-	    return "<?php echo is_string({$_return}) ? {$_return} : \\Smarty2\\Core::to_string( {$_return} ); ?>"
+	    return "<?php echo is_string({$_return}) ? {$_return} : \\Smarty2\\Kit\\Vars::toString( {$_return} ); ?>"
 		. $this->_additional_newline;
 	}
 
