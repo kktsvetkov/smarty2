@@ -1,6 +1,6 @@
 <?php
 
-namespace Smarty2\Tests\Plugins\Modifiers;
+namespace Smarty2\Tests\Plugin\Modifier;
 
 use Smarty2\Tests\TestCase;
 
@@ -14,14 +14,14 @@ class EscapeModifierTest extends TestCase
 		$filepath = $this->smarty->_get_plugin_filepath('modifier', 'escape');
 
 		$this->assertNotEmpty($filepath);
-		$this->assertTrue(0 !== strpos($filepath, 'plugins/modifier.escape.php'));
+		$this->assertTrue(false !== strpos($filepath, 'plugins/modifier.escape.php'));
 	}
 
 	function testIncludeFile()
 	{
 		$filepath = $this->smarty->_get_plugin_filepath('modifier', 'escape');
 
-		$this->assertEquals( include($filepath), 1 );
+		$this->assertEquals( include_once($filepath), 1 );
 	}
 
 	function testFunctionExists()
