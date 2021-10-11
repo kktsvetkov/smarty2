@@ -48,7 +48,7 @@ chmod 700 templates_c
 
 The project was converted to use a PSR-4 loaded namespace called `Smarty2`.
 The legacy class names of `Smarty` and `Smarty_Compiler` are still available
-as aliased to their descendants at `Smarty2\Engine` and `Smarty2\Compiler`.
+as aliased to their descendants at `Smarty2\Legacy` and `Smarty2\Compiler`.
 
 ## What is Smarty?
 
@@ -150,6 +150,10 @@ The `libs/internals` folder is removed from the project. All of the core
 internals are moved as methods to the `Smarty_Core` class, which eventually
 became the `Smarty2\Core` class.
 
+Furthermore, a lot of that core internals code was refactored, with some of
+the functionality delegated to other classes, and some of the old unnecessary
+code was just dropped.  
+
 #### Plugins (from libs/plugins)
 
 As the project was converted to using PSR-4 loaded namespace, the `libs/` folder
@@ -196,3 +200,9 @@ Few more things stripped form this project:
 
 - the `append="..."` argument for `{capture}` block tags
 - the `script="..."` argument for `{insert}` tags
+
+#### Smarty2\\Legacy
+
+All of the deprecated methods are kept in the `Smarty2\\Legacy` class. They
+are all empty and do nothing, but at least your code should be able to continue
+your existing code without any real big changes.
