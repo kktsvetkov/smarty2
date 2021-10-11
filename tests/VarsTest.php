@@ -9,8 +9,8 @@ class VarsTest extends TestCase
 {
 	/**
 	* @covers Smarty2\Engine::__construct()
-        * @covers Smarty2\Engine::assign()
-        * @covers Smarty2\Engine::get_template_vars()
+	* @covers Smarty2\Engine::assign()
+	* @covers Smarty2\Engine::get_template_vars()
 	*/
 	function testConstructorAssign()
 	{
@@ -22,8 +22,8 @@ class VarsTest extends TestCase
 
 	/**
 	* @covers Smarty2\Engine::clear_assign()
-        * @covers Smarty2\Engine::assign()
-        * @covers Smarty2\Engine::get_template_vars()
+	* @covers Smarty2\Engine::assign()
+	* @covers Smarty2\Engine::get_template_vars()
 	*/
 	function testAssignScalars()
 	{
@@ -50,8 +50,8 @@ class VarsTest extends TestCase
 
 	/**
 	* @covers Smarty2\Engine::clear_assign()
-        * @covers Smarty2\Engine::assign()
-        * @covers Smarty2\Engine::get_template_vars()
+	* @covers Smarty2\Engine::assign()
+	* @covers Smarty2\Engine::get_template_vars()
 	*/
 	function testAssignArrays()
 	{
@@ -72,8 +72,8 @@ class VarsTest extends TestCase
 	}
 
 	/**
-        * @covers Smarty2\Engine::assign()
-        * @covers Smarty2\Engine::get_template_vars()
+	* @covers Smarty2\Engine::assign()
+	* @covers Smarty2\Engine::get_template_vars()
 	*/
 	function testAssignTemplateVars()
 	{

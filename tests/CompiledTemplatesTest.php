@@ -10,7 +10,7 @@ use function unlink;
 class CompiledTemplatesTest extends TestCase
 {
 	/**
-        * @covers Smarty2\Engine::clear_compiled_tpl()
+	* @covers Smarty2\Engine::clear_compiled_tpl()
 	* @covers Smarty2\Engine::_get_compile_path()
 	* @covers Smarty2\Engine::_is_compiled()
 	*/
