@@ -227,49 +227,6 @@ class Core
 	}
 
 	/**
-	* write out a file to disk
-	*
-	* @param string $filename
-	* @param string $contents
-	* @return boolean
-	* @throws FilepathException
-	*/
-	static function write_file(string $filename, string $contents, &$smarty)
-	{
-		$folder = dirname($filename);
-		if (!is_dir($folder))
-		{
-			if (false === mkdir($folder, $smarty->_dir_perms, true))
-			{
-				throw new FilepathException(
-					"Failed to create folder '{$folder}'",
-					$folder
-					);
-			}
-		}
-
-		$tmp = tempnam($folder, basename($filename));
-		if (false === file_put_contents($tmp, $contents, LOCK_EX))
-		{
-			throw new FilepathException(
-				"Failed to write temporary file '{$tmp}'",
-				$tmp
-				);
-		}
-
-		if (false === rename($tmp, $filename))
-		{
-			throw new FilepathException(
-				"Failed to write file '{$filename}'",
-				$filename
-				);
-		}
-
-		chmod($filename, $smarty->_file_perms);
-		return true;
-	}
-
-	/**
 	* unlink a file, possibly using expiration time
 	*
 	* @param string $resource
