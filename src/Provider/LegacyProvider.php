@@ -5,6 +5,7 @@ namespace Smarty2\Provider;
 use Smarty2\Exception\FilepathException;
 
 use const DIRECTORY_SEPARATOR;
+use const SMARTY_DIR;
 
 use function array_push;
 use function array_unshift;
