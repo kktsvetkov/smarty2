@@ -359,7 +359,7 @@ class Compiler extends Engine
 		}
 	    }
 	    $_plugins_params .= '))';
-	    $plugins_code = "<?php \Smarty2\Core::load_plugins({$_plugins_params}, \$this); ?>\n";
+	    $plugins_code = "<?php \$this->_load_plugins({$_plugins_params}); ?>\n";
 	    $template_header .= $plugins_code;
 	    $this->_plugin_info = array();
 	    $this->_plugins_code = $plugins_code;
@@ -2096,7 +2096,7 @@ class Compiler extends Engine
 		if ($prefilter === false) {
 		    unset($this->_plugins['prefilter'][$filter_name]);
 		    $_params = array('plugins' => array(array('prefilter', $filter_name, null, null, false)));
-		    \Smarty2\Core::load_plugins($_params, $this);
+		    $this->_load_plugins($_params);
 		}
 	    }
 	}
@@ -2105,7 +2105,7 @@ class Compiler extends Engine
 		if ($postfilter === false) {
 		    unset($this->_plugins['postfilter'][$filter_name]);
 		    $_params = array('plugins' => array(array('postfilter', $filter_name, null, null, false)));
-		    \Smarty2\Core::load_plugins($_params, $this);
+		    $this->_load_plugins($_params);
 		}
 	    }
 	}
