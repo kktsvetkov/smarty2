@@ -964,13 +964,11 @@ class Engine
 		$params['quiet'] = $params['quiet'] ?? false;
 
 		$_return = false;
-		$_params = array(
-			'resource_name' => $params['resource_name'],
-			);
 
-		$this->_parse_resource_name($_params);
-		$_resource_type = $_params['resource_type'];
-		$_resource_name = $_params['resource_name'];
+		// split resource type from resrouce name
+		//
+		[$_resource_type, $_resource_name] =
+			$this->_parse_resource_name($params['resource_name']);
 
 		// unknown resource type ?
 		//
@@ -1026,8 +1024,8 @@ class Engine
 					$_return = call_user_func_array(
 						$this->default_template_handler_func,
 						array(
-							$_params['resource_type'],
-							$_params['resource_name'],
+							$_resource_type,
+							$_resource_name,
 							&$params['source_content'],
 							&$params['resource_timestamp'], &$this)
 						);
@@ -1040,7 +1038,7 @@ class Engine
 			if (!$params['quiet'])
 			{
 				$this->trigger_error(
-					"Unable to read resource {$_params['resource_type']}:{$_params['resource_name']}"
+					"Unable to read resource {$_resource_type}:{$_resource_name}"
 					);
 			}
 		}
@@ -1048,33 +1046,40 @@ class Engine
 		return $_return;
 	}
 
-    /**
-     * parse out the type and name from the resource
-     *
-     * @param string $resource_name
-     * @param string $resource_type
-     */
-    function _parse_resource_name(&$params)
-    {
+	/**
+	* Parse the type and name from the resource; if resource type is
+	* omitted, {@link $smarty->default_resource_type} is used instead
+	*
+	* @param string $resource_name
+	* @return array with two elements, type and name
+	*/
+	protected function _parse_resource_name(string $resource_name)
+	{
+		// split tpl_path by the first colon
+		$_resource_name_parts = explode(':', $resource_name, 2);
 
-	// split tpl_path by the first colon
-	$_resource_name_parts = explode(':', $params['resource_name'], 2);
+		// no resource type given
+		//
+		if (count($_resource_name_parts) == 1)
+		{
+			return array(
+				$this->default_resource_type,
+				$_resource_name_parts[0]
+			);
+		}
 
-	if (count($_resource_name_parts) == 1) {
-	    // no resource type given
-	    $params['resource_type'] = $this->default_resource_type;
-	    $params['resource_name'] = $_resource_name_parts[0];
-	} else {
-	    if(strlen($_resource_name_parts[0]) == 1) {
-		// 1 char is not resource type, but part of filepath
-		$params['resource_type'] = $this->default_resource_type;
-		$params['resource_name'] = $params['resource_name'];
-	    } else {
-		$params['resource_type'] = $_resource_name_parts[0];
-		$params['resource_name'] = $_resource_name_parts[1];
-	    }
+		// silly windows: 1 char is not resource type, but part of filepath
+		//
+		if(strlen($_resource_name_parts[0]) == 1)
+		{
+			return array(
+				$this->default_resource_type,
+				$resource_name
+			);
+		}
+
+		return $_resource_name_parts;
 	}
-    }
 
 	/**
 	* Load a resource plugin
