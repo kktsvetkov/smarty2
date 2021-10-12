@@ -470,41 +470,64 @@ class Engine
 	unset($this->_plugins['modifier'][$modifier]);
     }
 
-    /**
-     * Registers a resource to fetch a template
-     *
-     * @param string $type name of resource
-     * @param array $functions array of functions to handle resource
-     */
-    function register_resource($type, $functions)
-    {
-	if (count($functions)==4) {
-	    $this->_plugins['resource'][$type] =
-		array($functions, false);
+	/**
+	* Registers a resource to fetch a template
+	*
+	* @param string $type name of resource
+	* @param array $functions array of functions to handle resource
+	* @return self
+	*/
+	function register_resource(string $type, array $functions) : self
+	{
+		// With 4 elements the elements are the functions-callbacks
+		// for the respective source, timestamp, secure and trusted
+		// functions of the resource.
+		//
+		// Note: secure and trusted functions are no longer used
+		//
+		if (4 == count($functions))
+		{
+			$this->_plugins['resource'][$type] = array($functions, false);
+			return $this;
+		}
 
-	} elseif (count($functions)==5) {
-	    $this->_plugins['resource'][$type] =
-		array(array(array(&$functions[0], $functions[1])
-			    ,array(&$functions[0], $functions[2])
-			    ,array(&$functions[0], $functions[3])
-			    ,array(&$functions[0], $functions[4]))
-		      ,false);
+		// With 5 elements the first element has to be an
+		// object reference or a class name of the object
+		// or class implementing the resource and the 4
+		// following elements have to be the method names
+		// implementing source, timestamp, secure and trusted.
+		//
+		// Note: secure and trusted functions are no longer used
+		//
+		if (5 == count($functions))
+		{
+			$this->_plugins['resource'][$type] = array(
+				array(
+					array(&$functions[0], $functions[1]),
+					array(&$functions[0], $functions[2]),
+					array(&$functions[0], $functions[3]),
+					array(&$functions[0], $functions[4])
+				) ,false);
+			return $this;
+		}
 
-	} else {
-	    $this->trigger_error("malformed function-list for '$type' in register_resource");
-
+		throw new \InvalidArgumentException(
+			"Malformed function-list for '{$type}' resource in "
+				. __METHOD__ . '()'
+			);
 	}
-    }
 
-    /**
-     * Unregisters a resource
-     *
-     * @param string $type name of resource
-     */
-    function unregister_resource($type)
-    {
-	unset($this->_plugins['resource'][$type]);
-    }
+	/**
+	* Unregisters a resource
+	*
+	* @param string $type name of resource
+	* @return self
+	*/
+	function unregister_resource($type) : self
+	{
+		unset($this->_plugins['resource'][$type]);
+		return $this;
+	}
 
     /**
      * Registers a prefilter function to apply
