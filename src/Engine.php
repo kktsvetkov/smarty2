@@ -964,13 +964,24 @@ class Engine
 	if(!isset($params['quiet'])) { $params['quiet'] = false; }
 
 	$_return = false;
-	$_params = array('resource_name' => $params['resource_name']) ;
-	if (isset($params['resource_base_path']))
-	    $_params['resource_base_path'] = $params['resource_base_path'];
-	else
-	    $_params['resource_base_path'] = $this->template_dir;
+	$_params = array(
+		'resource_name' => $params['resource_name'],
+		'resource_base_path' => $this->template_dir,
+		);
+	try {
+		$result = $this->_parse_resource_name($_params);
+	}
+	catch (Exception\ResourceException $e)
+	{
+		if ($params['quiet'])
+		{
+			return false;
+		}
 
-	if ($this->_parse_resource_name($_params)) {
+		throw $e;
+	}
+
+	if ($result) {
 	    $_resource_type = $_params['resource_type'];
 	    $_resource_name = $_params['resource_name'];
 	    switch ($_resource_type) {
@@ -1057,6 +1068,16 @@ class Engine
 	    }
 	}
 
+	if ('file' != $params['resource_type'])
+	{
+		if (empty($this->_plugins['resource'][$params['resource_type']]))
+		{
+			$this->_load_resource_plugin( $params['resource_type'] );
+		}
+	}
+
+	// if "file", try to resolve the *real* filename
+	//
 	if ($params['resource_type'] == 'file') {
 	    if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $params['resource_name'])) {
 		// relative pathname to $params['resource_base_path']
@@ -1074,21 +1095,17 @@ class Engine
 		/* absolute path */
 		return is_file($params['resource_name']);
 	    }
-	} else
-	if (empty($this->_plugins['resource'][$params['resource_type']]))
-	{
-	    $this->_load_resource_plugin( $params['resource_type'] );
 	}
 
 	return true;
     }
 
-
-
 	/**
 	* Load a resource plugin
 	*
 	* @param string $type
+	* @return boolean
+	* @throws Smarty2\Exception\ResourceException
 	*/
 	protected function _load_resource_plugin(string $type)
 	{
@@ -1098,44 +1115,12 @@ class Engine
 		* functions provided by the plugin, the second one indicates whether
 		* all of them exist or not.
 		*/
-		$_plugin = &$this->_plugins['resource'][ $type ];
-
-		// already loaded
-		//
-		if (!empty($_plugin[1]))
+		if (!empty($this->_plugins['resource'][ $type ]))
 		{
-			return true;
+			return false; /* already loaded */
 		}
 
-		// check that all callbacks are callable
-		//
-		if (isset($_plugin))
-		{
-			if (empty($_plugin[0]))
-			{
-				throw new Exception\ResourceException(
-					"Resource '{$type}' is not implemented"
-					);
-			}
-
-			$_plugin[1] = true;
-			foreach ($_plugin[0] as $_plugin_func)
-			{
-				if (is_callable($_plugin_func))
-				{
-					continue;
-				}
-
-				throw new Exception\ResourceException(
-					"Resource '{$type}' is not fully implemented: "
-						. "{$_plugin_func}() is not callable"
-					);
-			}
-
-			return;
-		}
-
-		// nothing loaded yet, try a resource.$type.php file 
+		// load from resource.$type.php file
 		//
 		$_plugin_file = $this->_get_plugin_filepath('resource', $type);
 		if ($_plugin_file)
@@ -1154,20 +1139,23 @@ class Engine
 			foreach ($_resource_ops as $_op)
 			{
 				$_plugin_func = 'smarty_resource_' . $type . '_' . $_op;
-				if (!function_exists($_plugin_func))
-				{
-					$this->_trigger_fatal_error(
-					"[plugin] function {$_plugin_func}() not found in {$_plugin_file}",
-					null, null, __FILE__, __LINE__);
-					return;
-				} else
+				if (function_exists($_plugin_func))
 				{
 					$_resource_funcs[] = $_plugin_func;
 				}
+
+				throw new Exception\ResourceException(
+					"Function {$_plugin_func}() not found in {$_plugin_file}"
+					);
 			}
 
 			$this->_plugins['resource'][ $type ] = array($_resource_funcs, true);
+			return true;
 		}
+
+		throw new Exception\ResourceException(
+			"Resource '{$type}' is not implemented"
+			);
 	}
 
     /**
