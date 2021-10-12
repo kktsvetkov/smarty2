@@ -5,7 +5,7 @@ namespace Smarty2\Exception;
 use Smarty2\Exception\TemplateErrorTrait;
 use UnexpectedValueException;
 
-class SyntaxException extends UnexpectedValueException
+class PluginException extends UnexpectedValueException
 {
 	use TemplateErrorTrait;
 

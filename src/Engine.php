@@ -1335,7 +1335,7 @@ class Engine
 				{
 					if (!is_callable($_plugin[0]))
 					{
-						throw new Exception\SyntaxException(
+						throw new Exception\PluginException(
 							"[plugin] {$_type} '{$_name}' is not implemented: {$_plugin[0]}",
 							$_tpl_file, $_tpl_line
 							);
@@ -1366,7 +1366,7 @@ class Engine
 					$_name,
 					$this->security_settings['MODIFIER_FUNCS']))
 				{
-					throw new Exception\SyntaxException(
+					throw new Exception\PluginException(
 						"(secure mode) modifier '{$_name}' is not allowed",
 						$_tpl_file, $_tpl_line
 						);
@@ -1380,7 +1380,7 @@ class Engine
 
 			if (!$_plugin_file)
 			{
-				throw new Exception\SyntaxException(
+				throw new Exception\PluginException(
 					"[plugin] {$_type} '{$_name}' is not implemented",
 					$_tpl_file, $_tpl_line
 					);
@@ -1400,7 +1400,7 @@ class Engine
 			$_plugin_func = 'smarty_' . $_type . '_' . $_name;
 			if (!function_exists($_plugin_func))
 			{
-				throw new Exception\SyntaxException(
+				throw new Exception\PluginException(
 					"[plugin] function {$_plugin_func}() not found in {$_plugin_file}",
 					$_tpl_file, $_tpl_line
 					);
