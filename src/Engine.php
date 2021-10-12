@@ -2,7 +2,7 @@
 
 namespace Smarty2;
 
-use Smarty2\Exception\FilepathException;
+use Smarty2\Exception;
 
 /**
 * Smarty2 - the PHP template engine
@@ -511,7 +511,7 @@ class Engine
 			return $this;
 		}
 
-		throw new \InvalidArgumentException(
+		throw new Exception\ResourceException(
 			"Malformed function-list for '{$type}' resource in "
 				. __METHOD__ . '()'
 			);
@@ -1077,13 +1077,98 @@ class Engine
 	} else
 	if (empty($this->_plugins['resource'][$params['resource_type']]))
 	{
-	    $_params = array('type' => $params['resource_type']);
-	    \Smarty2\Core::load_resource_plugin($_params, $this);
+	    $this->_load_resource_plugin( $params['resource_type'] );
 	}
 
 	return true;
     }
 
+
+
+	/**
+	* Load a resource plugin
+	*
+	* @param string $type
+	*/
+	protected function _load_resource_plugin(string $type)
+	{
+		/*
+		* Resource plugins are not quite like the other ones, so they are
+		* handled differently. The first element of plugin info is the array of
+		* functions provided by the plugin, the second one indicates whether
+		* all of them exist or not.
+		*/
+		$_plugin = &$this->_plugins['resource'][ $type ];
+
+		// already loaded
+		//
+		if (!empty($_plugin[1]))
+		{
+			return true;
+		}
+
+		// check that all callbacks are callable
+		//
+		if (isset($_plugin))
+		{
+			if (empty($_plugin[0]))
+			{
+				throw new Exception\ResourceException(
+					"Resource '{$type}' is not implemented"
+					);
+			}
+
+			$_plugin[1] = true;
+			foreach ($_plugin[0] as $_plugin_func)
+			{
+				if (is_callable($_plugin_func))
+				{
+					continue;
+				}
+
+				throw new Exception\ResourceException(
+					"Resource '{$type}' is not fully implemented: "
+						. "{$_plugin_func}() is not callable"
+					);
+			}
+
+			return;
+		}
+
+		// nothing loaded yet, try a resource.$type.php file 
+		//
+		$_plugin_file = $this->_get_plugin_filepath('resource', $type);
+		if ($_plugin_file)
+		{
+			/*
+			* If the plugin file is found, it -must- provide the
+			* properly named plugin functions.
+			*/
+			include_once($_plugin_file);
+
+			/*
+			* Locate functions that we require the plugin to provide.
+			*/
+			$_resource_ops = array('source', 'timestamp', 'secure', 'trusted');
+			$_resource_funcs = array();
+			foreach ($_resource_ops as $_op)
+			{
+				$_plugin_func = 'smarty_resource_' . $type . '_' . $_op;
+				if (!function_exists($_plugin_func))
+				{
+					$this->_trigger_fatal_error(
+					"[plugin] function {$_plugin_func}() not found in {$_plugin_file}",
+					null, null, __FILE__, __LINE__);
+					return;
+				} else
+				{
+					$_resource_funcs[] = $_plugin_func;
+				}
+			}
+
+			$this->_plugins['resource'][ $type ] = array($_resource_funcs, true);
+		}
+	}
 
     /**
      * Handle modifiers
