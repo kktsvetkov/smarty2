@@ -1316,7 +1316,7 @@ class Engine
 	{
 		foreach ($params['plugins'] as $_plugin_info)
 		{
-			list($_type, $_name, $_tpl_file, $_tpl_line, $_delayed_loading) = $_plugin_info;
+			list($_type, $_name, $_tpl_file, $_tpl_line) = $_plugin_info;
 			$_plugin = &$this->_plugins[$_type][$_name];
 
 			/*
@@ -1335,126 +1335,79 @@ class Engine
 				{
 					if (!is_callable($_plugin[0]))
 					{
-						$this->_trigger_fatal_error(
-							"[plugin] $_type '$_name' is not implemented",
-							$_tpl_file, $_tpl_line,
-							__FILE__, __LINE__);
-					} else
-					{
-						$_plugin[1] = $_tpl_file;
-						$_plugin[2] = $_tpl_line;
-						$_plugin[3] = true;
-						if (!isset($_plugin[4])) $_plugin[4] = true; /* cacheable */
+						throw new Exception\SyntaxException(
+							"[plugin] {$_type} '{$_name}' is not implemented: {$_plugin[0]}",
+							$_tpl_file, $_tpl_line
+							);
 					}
+
+					$_plugin[1] = $_tpl_file;
+					$_plugin[2] = $_tpl_line;
+					$_plugin[3] = true;
+					if (!isset($_plugin[4])) $_plugin[4] = true; /* cacheable */
 				}
 
 				continue;
-			} else
-
-			if ($_type == 'insert')
-			{
-				/*
-				* For backwards compatibility, we check for insert functions in
-				* the symbol table before trying to load them as a plugin.
-				*/
-				$_plugin_func = 'insert_' . $_name;
-				if (function_exists($_plugin_func))
-				{
-					$_plugin = array($_plugin_func, $_tpl_file, $_tpl_line, true, false);
-					continue;
-				}
 			}
 
 			$_plugin_file = $this->_get_plugin_filepath($_type, $_name);
 
-			if (! $_found = ($_plugin_file != false))
+			/*
+			* PHP functions as modifiers, no plugins to load
+			*/
+			if (!$_plugin_file && ($_type == 'modifier') && function_exists($_name))
 			{
-				$_message = "could not load plugin file '$_type.$_name.php'\n";
+				/*
+				* In case modifier falls back on using PHP functions
+				* directly, we only allow those specified in the security
+				* context.
+				*/
+				if ($this->security && !in_array(
+					$_name,
+					$this->security_settings['MODIFIER_FUNCS']))
+				{
+					throw new Exception\SyntaxException(
+						"(secure mode) modifier '{$_name}' is not allowed",
+						$_tpl_file, $_tpl_line
+						);
+				}
+
+				$_plugin_func = $_name;
+				$this->_plugins[$_type][$_name] =
+					array($_plugin_func, $_tpl_file, $_tpl_line, true, true);
+				continue;
 			}
+
+			if (!$_plugin_file)
+			{
+				throw new Exception\SyntaxException(
+					"[plugin] {$_type} '{$_name}' is not implemented",
+					$_tpl_file, $_tpl_line
+					);
+			}
+
+			// included files rely on $smarty being present
+			// there in the local variable scope
+			//
+			$smarty =& $this;
+			include_once $_plugin_file;
 
 			/*
 			* If plugin file is found, it -must- provide the properly named
 			* plugin function. In case it doesn't, simply output the error and
 			* do not fall back on any other method.
 			*/
-			if ($_found)
+			$_plugin_func = 'smarty_' . $_type . '_' . $_name;
+			if (!function_exists($_plugin_func))
 			{
-				// included files rely on $smarty being present
-				// there in the local variable scope
-				//
-				$smarty =& $this;
-				include_once $_plugin_file;
-
-				$_plugin_func = 'smarty_' . $_type . '_' . $_name;
-				if (!function_exists($_plugin_func))
-				{
-					$this->_trigger_fatal_error(
-						"[plugin] function {$_plugin_func}() not found in {$_plugin_file}",
-						$_tpl_file, $_tpl_line,
-						__FILE__, __LINE__);
-					continue;
-				}
-			} else
-
-			/*
-			* In case of insert plugins, their code may be loaded later via
-			* 'script' attribute.
-			*/
-			if ($_type == 'insert' && $_delayed_loading)
-			{
-				$_plugin_func = 'smarty_' . $_type . '_' . $_name;
-				$_found = true;
+				throw new Exception\SyntaxException(
+					"[plugin] function {$_plugin_func}() not found in {$_plugin_file}",
+					$_tpl_file, $_tpl_line
+					);
 			}
 
-			/*
-			* Plugin specific processing and error checking.
-			*/
-			if (!$_found)
-			{
-				if ($_type == 'modifier')
-				{
-					/*
-					* In case modifier falls back on using PHP functions
-					* directly, we only allow those specified in the security
-					* context.
-					*/
-					if ($this->security && !in_array($_name, $this->security_settings['MODIFIER_FUNCS']))
-					{
-						$_message = "(secure mode) modifier '$_name' is not allowed";
-					} else
-					{
-						if (!function_exists($_name))
-						{
-							$_message = "modifier '$_name' is not implemented";
-						} else
-						{
-							$_plugin_func = $_name;
-							$_found = true;
-						}
-					}
-
-				} else
-				if ($_type == 'function')
-				{
-					/*
-					* This is a catch-all situation.
-					*/
-					$_message = "unknown tag - '$_name'";
-				}
-			}
-
-			if ($_found)
-			{
-				$this->_plugins[$_type][$_name] =
-					array($_plugin_func, $_tpl_file, $_tpl_line, true, true);
-			} else
-			{
-				// output error
-				$this->_trigger_fatal_error(
-					'[plugin] ' . $_message,
-					$_tpl_file, $_tpl_line,
-					__FILE__, __LINE__);
-			}
+			$this->_plugins[$_type][$_name] =
+				array($_plugin_func, $_tpl_file, $_tpl_line, true, true);
 		}
 	}
 }
