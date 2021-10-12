@@ -146,18 +146,16 @@ presentation layer that Smarty provides.
 
 #### Core Internals (from libs/internals)
 
-The `libs/internals` folder is removed from the project. All of the core
-internals are moved as methods to the `Smarty_Core` class, which eventually
-became the `Smarty2\Core` class.
-
-Furthermore, a lot of that core internals code was refactored, with some of
-the functionality delegated to other classes, and some of the old unnecessary
-code was just dropped.  
+The `libs/internals` folder is removed from the project. The some of the core
+internals were moved to `Smarty2\Engine`, while other are dropped (as they
+are not necessary anymore). This happened as the core internals code was
+refactored, with some of the functionality delegated to other classes, and
+some of the old unnecessary code was just dropped.  
 
 #### Plugins (from libs/plugins)
 
 As the project was converted to using PSR-4 loaded namespace, the `libs/` folder
-was dropped. The core project files are moved to `src/`, and the `plugins/`
+was dropped. The main project files are moved to `src/`, and the `plugins/`
 folder is moved to the root. The `SMARTY_DIR` used to load the plugins is adjusted
 accordingly to point to the correct folder.
 
