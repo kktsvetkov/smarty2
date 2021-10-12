@@ -1700,7 +1700,8 @@ class Compiler extends Engine
 			if ($this->security) {
 			    $this->_syntax_error('(secure) call to dynamic object member is not allowed');
 			} else {
-			    $_output .= '->{(($_var=$this->_tpl_vars[\''.substr($_index,3).'\']) && substr($_var,0,2)!=\'__\') ? $_var : $this->trigger_error("cannot access property \\"$_var\\"")}';
+			    $_output .= '->{(($_var=$this->_tpl_vars[\''.substr($_index,3)
+				    . '\']) && substr($_var,0,2)!=\'__\') ? $_var : $this->trigger_error("cannot access property \\"$_var\\"")}';
 			}
 		    } else {
 			$_output .= $_index;
