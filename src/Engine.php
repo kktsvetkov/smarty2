@@ -944,108 +944,115 @@ class Engine
 			);
 	}
 
-    /**
-     * fetch the template info. Gets timestamp, and source
-     * if get_source is true
-     *
-     * sets $source_content to the source of the template, and
-     * $resource_timestamp to its time stamp
-     * @param string $resource_name
-     * @param string $source_content
-     * @param integer $resource_timestamp
-     * @param boolean $get_source
-     * @param boolean $quiet
-     * @return boolean
-     */
-
-    function _fetch_resource_info(&$params)
-    {
-	if(!isset($params['get_source'])) { $params['get_source'] = true; }
-	if(!isset($params['quiet'])) { $params['quiet'] = false; }
-
-	$_return = false;
-	$_params = array(
-		'resource_name' => $params['resource_name'],
-		'resource_base_path' => $this->template_dir,
-		);
-	try {
-		$result = $this->_parse_resource_name($_params);
-	}
-	catch (Exception\ResourceException $e)
+	/**
+	* fetch the template info. Gets timestamp, and source
+	* if get_source is true
+	*
+	* sets $source_content to the source of the template, and
+	* $resource_timestamp to its timestamp
+	*
+	* @param string $resource_name
+	* @param string $source_content
+	* @param integer $resource_timestamp
+	* @param boolean $get_source
+	* @param boolean $quiet
+	* @return boolean
+	*/
+	function _fetch_resource_info(&$params)
 	{
-		if ($params['quiet'])
+		$params['get_source'] = $params['get_source'] ?? true;
+		$params['quiet'] = $params['quiet'] ?? false;
+
+		$_return = false;
+		$_params = array(
+			'resource_name' => $params['resource_name'],
+			);
+
+		$this->_parse_resource_name($_params);
+		$_resource_type = $_params['resource_type'];
+		$_resource_name = $_params['resource_name'];
+
+		// unknown resource type ?
+		//
+		if (empty($this->_plugins['resource'][ $_resource_type ]))
 		{
-			return false;
-		}
-
-		throw $e;
-	}
-
-	if ($result) {
-	    $_resource_type = $_params['resource_type'];
-	    $_resource_name = $_params['resource_name'];
-	    switch ($_resource_type) {
-		case 'file':
-		    $_return = is_file($_resource_name) && is_readable($_resource_name);
-		    if ($_return)
-		    {
-			if ($params['get_source'])
-			{
-			    $params['source_content'] = file_get_contents($_resource_name);
+			try {
+				$this->_load_resource_plugin( $_resource_type );
 			}
-			$params['resource_timestamp'] = filemtime($_resource_name);
-		    }
-		    break;
+			catch (Exception\ResourceException $e)
+			{
+				if ($params['quiet'])
+				{
+					return false;
+				}
 
-		default:
-		    // call resource functions to fetch the template source and timestamp
-		    if ($params['get_source']) {
-			$_source_return = isset($this->_plugins['resource'][$_resource_type]) &&
-			    call_user_func_array($this->_plugins['resource'][$_resource_type][0][0],
-						 array($_resource_name, &$params['source_content'], &$this));
-		    } else {
-			$_source_return = true;
-		    }
-
-		    $_timestamp_return = isset($this->_plugins['resource'][$_resource_type]) &&
-			call_user_func_array($this->_plugins['resource'][$_resource_type][0][1],
-					     array($_resource_name, &$params['resource_timestamp'], &$this));
-
-		    $_return = $_source_return && $_timestamp_return;
-		    break;
-	    }
-	}
-
-	if (!$_return) {
-	    // see if we can get a template with the default template handler
-	    if (!empty($this->default_template_handler_func)) {
-		if (!is_callable($this->default_template_handler_func)) {
-		    $this->trigger_error("default template handler function \"$this->default_template_handler_func\" doesn't exist.");
-		} else {
-		    $_return = call_user_func_array(
-			$this->default_template_handler_func,
-			array($_params['resource_type'], $_params['resource_name'], &$params['source_content'], &$params['resource_timestamp'], &$this));
+				throw $e;
+			}
 		}
-	    }
-	}
 
-	if (!$_return) {
-	    if (!$params['quiet']) {
-		$this->trigger_error('unable to read resource: "' . $params['resource_name'] . '"');
-	    }
-	}
-	return $_return;
-    }
+		// call resource functions to fetch the template source and timestamp
+		if ($params['get_source'])
+		{
+			$_source_return = isset($this->_plugins['resource'][$_resource_type])
+			&& call_user_func_array(
+				$this->_plugins['resource'][$_resource_type][0][0],
+				array(&$_resource_name, &$params['source_content'], &$this)
+				);
+		} else
+		{
+			$_source_return = true;
+		}
 
+		$_timestamp_return = isset($this->_plugins['resource'][$_resource_type])
+			&& call_user_func_array(
+				$this->_plugins['resource'][$_resource_type][0][1],
+				array(&$_resource_name, &$params['resource_timestamp'], &$this)
+				);
+
+		$_return = $_source_return && $_timestamp_return;
+
+		if (!$_return)
+		{
+			// see if we can get a template with the default template handler
+			if (!empty($this->default_template_handler_func))
+			{
+				if (!is_callable($this->default_template_handler_func))
+				{
+					$this->trigger_error(
+						"default template handler function \"$this->default_template_handler_func\" doesn't exist."
+						);
+				} else
+				{
+					$_return = call_user_func_array(
+						$this->default_template_handler_func,
+						array(
+							$_params['resource_type'],
+							$_params['resource_name'],
+							&$params['source_content'],
+							&$params['resource_timestamp'], &$this)
+						);
+				}
+			}
+		}
+
+		if (!$_return)
+		{
+			if (!$params['quiet'])
+			{
+				$this->trigger_error(
+					"Unable to read resource {$_params['resource_type']}:{$_params['resource_name']}"
+					);
+			}
+		}
+
+		return $_return;
+	}
 
     /**
      * parse out the type and name from the resource
      *
-     * @param string $resource_base_path
      * @param string $resource_name
      * @param string $resource_type
-     * @param string $resource_name
-     * @return boolean
      */
     function _parse_resource_name(&$params)
     {
@@ -1067,37 +1074,6 @@ class Engine
 		$params['resource_name'] = $_resource_name_parts[1];
 	    }
 	}
-
-	if ('file' != $params['resource_type'])
-	{
-		if (empty($this->_plugins['resource'][$params['resource_type']]))
-		{
-			$this->_load_resource_plugin( $params['resource_type'] );
-		}
-	}
-
-	// if "file", try to resolve the *real* filename
-	//
-	if ($params['resource_type'] == 'file') {
-	    if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $params['resource_name'])) {
-		// relative pathname to $params['resource_base_path']
-		// use the first directory where the file is found
-		foreach ((array)$params['resource_base_path'] as $_curr_path) {
-		    $_fullpath = $_curr_path . DIRECTORY_SEPARATOR . $params['resource_name'];
-		    if (is_file($_fullpath))
-		    {
-			$params['resource_name'] = $_fullpath;
-			return true;
-		    }
-		}
-		return false;
-	    } else {
-		/* absolute path */
-		return is_file($params['resource_name']);
-	    }
-	}
-
-	return true;
     }
 
 	/**
@@ -1142,6 +1118,7 @@ class Engine
 				if (function_exists($_plugin_func))
 				{
 					$_resource_funcs[] = $_plugin_func;
+					continue;
 				}
 
 				throw new Exception\ResourceException(
@@ -1398,7 +1375,7 @@ class Engine
 			if ($_found)
 			{
 				// included files rely on $smarty being present
-				// there in the local variable scope  
+				// there in the local variable scope
 				//
 				$smarty =& $this;
 				include_once $_plugin_file;
