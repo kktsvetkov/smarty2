@@ -16,9 +16,7 @@ class TestCase extends PHPUnit_TestCase
 		$smarty = new Engine;
 
 		$smarty->template_dir = __DIR__ . '/templates';
-
 		$smarty->compile_dir = sys_get_temp_dir() . '/smarty.compiled';
-
 		$smarty->compile_check = true;
 
 		$this->smarty = $smarty;

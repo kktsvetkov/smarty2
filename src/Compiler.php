@@ -3,6 +3,7 @@
 namespace Smarty2;
 
 use Smarty2\Exception\SyntaxException as BadSyntaxException;
+use Smarty2\Kit;
 
 use const E_USER_ERROR;
 use const E_USER_WARNING;
@@ -850,7 +851,7 @@ class Compiler extends Engine
 	    }
 
 	    if(!empty($_assign_var)) {
-		$output = "\$this->assign('" . $this->_dequote($_assign_var) ."',  $return);";
+		$output = "\$this->assign('" . Kit\Args::dequote($_assign_var) ."',  $return);";
 	    } else {
 		$output = 'echo ' . $return . ';';
 		$newline = $this->_additional_newline;
@@ -871,7 +872,7 @@ class Compiler extends Engine
     function _compile_insert_tag($tag_args)
     {
 	$attrs = $this->_parse_attrs($tag_args);
-	$name = $this->_dequote($attrs['name']);
+	$name = Kit\Args::dequote($attrs['name']);
 
 	if (empty($name)) {
 	    return $this->_syntax_error("missing insert name");
@@ -1074,13 +1075,14 @@ class Compiler extends Engine
 	if (empty($attrs['item'])) {
 	    return $this->_syntax_error("foreach: missing 'item' attribute");
 	}
-	$item = $this->_dequote($attrs['item']);
+
+	$item = Kit\Args::dequote($attrs['item']);
 	if (!preg_match('~^\w+$~', $item)) {
 	    return $this->_syntax_error("foreach: 'item' must be a variable name (literal string)");
 	}
 
 	if (isset($attrs['key'])) {
-	    $key  = $this->_dequote($attrs['key']);
+	    $key  = Kit\Args::dequote($attrs['key']);
 	    if (!preg_match('~^\w+$~', $key)) {
 		return $this->_syntax_error("foreach: 'key' must to be a variable name (literal string)");
 	    }

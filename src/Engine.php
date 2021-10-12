@@ -1108,21 +1108,6 @@ class Engine
     }
 
     /**
-     * Remove starting and ending quotes from the string
-     *
-     * @param string $string
-     * @return string
-     */
-    function _dequote($string)
-    {
-	if ((substr($string, 0, 1) == "'" || substr($string, 0, 1) == '"') &&
-	    substr($string, -1) == substr($string, 0, 1))
-	    return substr($string, 1, -1);
-	else
-	    return $string;
-    }
-
-    /**
      * trigger Smarty plugin error
      *
      * @param string $error_msg
@@ -1147,40 +1132,47 @@ class Engine
 	}
     }
 
-    /**
-     * called for included templates
-     *
-     * @param string $_smarty_include_tpl_file
-     * @param string $_smarty_include_vars
-     */
-    function _smarty_include($params)
-    {
-	if ($this->debugging) {
-	    $debug_start_time = microtime(true);
-	    $this->_smarty_debug_info[] = array('type'      => 'template',
-			'filename'  => $params['smarty_include_tpl_file'],
-			'depth'     => ++$this->_inclusion_depth);
-	    $included_tpls_idx = count($this->_smarty_debug_info) - 1;
-	}
-
-	$this->_tpl_vars = array_merge($this->_tpl_vars, $params['smarty_include_vars']);
-
-	$_smarty_compile_path = $this->_get_compile_path($params['smarty_include_tpl_file']);
-
-	if ($this->_is_compiled($params['smarty_include_tpl_file'], $_smarty_compile_path)
-	    || $this->_compile_resource($params['smarty_include_tpl_file'], $_smarty_compile_path))
+	/**
+	* called for included templates
+	*
+	* @param string $_smarty_include_tpl_file
+	* @param string $_smarty_include_vars
+	*/
+	function _smarty_include($params)
 	{
-	    include($_smarty_compile_path);
-	}
+		if ($this->debugging)
+		{
+			$debug_start_time = microtime(true);
+			$this->_smarty_debug_info[] = array(
+				'type' => 'template',
+				'filename' => $params['smarty_include_tpl_file'],
+				'depth' => ++$this->_inclusion_depth
+				);
 
-	$this->_inclusion_depth--;
+			$included_tpls_idx = count($this->_smarty_debug_info) - 1;
+		}
 
-	if ($this->debugging) {
-	    // capture time for debugging info
-	    $this->_smarty_debug_info[$included_tpls_idx]['exec_time'] =
-	    microtime(true) - $debug_start_time;
+		$this->_tpl_vars = array_merge($this->_tpl_vars, $params['smarty_include_vars']);
+
+		$_smarty_compile_path = $this->_get_compile_path(
+			$params['smarty_include_tpl_file']
+			);
+
+		if ($this->_is_compiled($params['smarty_include_tpl_file'], $_smarty_compile_path)
+			|| $this->_compile_resource($params['smarty_include_tpl_file'], $_smarty_compile_path))
+		{
+			include($_smarty_compile_path);
+		}
+
+		$this->_inclusion_depth--;
+
+		if ($this->debugging)
+		{
+			// capture time for debugging info
+			$this->_smarty_debug_info[$included_tpls_idx]['exec_time'] =
+				microtime(true) - $debug_start_time;
+		}
 	}
-    }
 
 	/**
 	* wrapper for include() retaining $this
