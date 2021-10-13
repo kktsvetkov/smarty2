@@ -1829,7 +1829,7 @@ class Compiler extends Engine
 		&& function_exists($_modifier_name)) {
 		if ($this->security && !in_array($_modifier_name, $this->security_settings['MODIFIER_FUNCS']))
 		{
-		    throw new BadSyntaxException((
+		    throw new BadSyntaxException(
 			    "[plugin] (secure mode) modifier '{$_modifier_name}' is not allowed" ,
 			    $this->_current_file, $this->_current_line_no
 		    	);
