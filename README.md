@@ -83,6 +83,26 @@ Some of Smarty's features:
   is so customizable.
 * and many more.
 
+## Security
+
+The old security settings at `$smarty->security` and `$smarty->security_settings`
+are preserved in `Smarty2\Legacy` engine. Under the hood these settings are
+imported into the new `Smarty2\Security\Policy` classes. If you are using the
+new engine class, `Smarty2\Engine`, then in order to enforce a security policy
+you must set it explicitly like this:
+
+```php
+$smarty = new Smarty2\Engine;
+$smarty->setSecurityPolicy(
+	new Smarty2\Security\Policy(
+		Smarty2\Security\Policy::DEFAULT_IF_FUNCS,
+		Smarty2\Security\Policy::DEFAULT_MODIFIER_FUNCS,
+		$allowConstants = false,
+		$allowSuperGlobals = true		
+	)
+);
+```
+
 ## Dropped or Deprecated Features
 
 One of the goals for this project is to cut down any dated or legacy features,

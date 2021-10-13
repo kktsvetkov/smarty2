@@ -14,6 +14,7 @@ use const E_USER_WARNING;
  */
 class Compiler extends Engine
 {
+	use Security\PolicyAwareTrait;
 
     // internal vars
     /**#@+
@@ -1310,7 +1311,7 @@ class Compiler extends Engine
 		default:
 		    if(preg_match('~^' . $this->_func_regexp . '$~', $token) ) {
 			    // function call
-			    if(!$this->securityPolicy()->isIfFunctionAllowed($token))
+			    if(!$this->getSecurityPolicy()->isIfFunctionAllowed($token))
 			     {
 				throw new BadSyntaxException(
 					"(security) '{$token}' not allowed in IF statement",
@@ -1833,7 +1834,7 @@ class Compiler extends Engine
 	    if (empty($this->_plugins['modifier'][$_modifier_name])
 		&& !$this->_get_plugin_filepath('modifier', $_modifier_name)
 		&& function_exists($_modifier_name)) {
-		if (!$this->securityPolicy()->isModifierAllowed($_modifier_name))
+		if (!$this->getSecurityPolicy()->isModifierAllowed($_modifier_name))
 		{
 		    throw new BadSyntaxException(
 			    "(security) modifier '{$_modifier_name}' is not allowed" ,
@@ -1955,9 +1956,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'get':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -1971,9 +1972,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'post':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -1987,9 +1988,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'cookies':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -2003,9 +2004,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'env':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -2019,9 +2020,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'server':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -2036,9 +2037,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'session':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -2056,9 +2057,9 @@ class Compiler extends Engine
 	     * compiler.
 	     */
 	    case 'request':
-	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+	    	if (!$this->getSecurityPolicy()->areSuperGlobalsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Super Globals Access Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no
@@ -2086,9 +2087,9 @@ class Compiler extends Engine
 		break;
 
 	    case 'const':
-	    	if (!$this->securityPolicy()->areConstantsAllowed())
+	    	if (!$this->getSecurityPolicy()->areConstantsAllowed())
 		{
-			$this->securityPolicy()->issueWarning(
+			$this->getSecurityPolicy()->issueWarning(
 				'Constants Not Permitted',
 				$this->_current_file,
 				$this->_current_line_no

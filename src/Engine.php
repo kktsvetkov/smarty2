@@ -3,7 +3,7 @@
 namespace Smarty2;
 
 use Smarty2\Exception;
-use Smarty2\Security as SmartySecurity;
+use Smarty2\Security\Policy as SecurityPolicy;
 
 /**
 * Smarty2 - the PHP template engine
@@ -14,6 +14,7 @@ class Engine
 {
 	use Engine\ConfigVarsTrait;
 	use Engine\RegisteredObjectsTrait;
+	use Security\PolicyAwareTrait;
 
 	/**
 	* Smarty version number
@@ -80,28 +81,7 @@ class Engine
      */
     public bool $force_compile   =  false;
 
-	/**
-	* This enables template security. When enabled, many things are restricted
-	* in the templates that normally would go unchecked. This is useful when
-	* untrusted parties are editing templates and you want a reasonable level
-	* of security. (no direct execution of PHP in templates for example)
-	*
-	* @var boolean
-	*/
-	public bool $security = false;
 
-	/**
-	* These are the security settings for Smarty. They are used only when
-	* {@link Smarty2\Engine::$security} is enabled.
-	*
-	* @var array
-	*/
-	public array $security_settings  = array(
-		'IF_FUNCS' => SmartySecurity::DEFAULT_IF_FUNCS,
-		'MODIFIER_FUNCS' => SmartySecurity::DEFAULT_MODIFIER_FUNCS,
-		'ALLOW_CONSTANTS' => false,
-		'ALLOW_SUPER_GLOBALS' => true
-		);
 
     /**
      * The left delimiter used for the template tags.
@@ -260,13 +240,13 @@ class Engine
 				       'insert'	=> array());
     /**#@-*/
 
-    /**
-     * The class constructor.
-     */
-    public function __construct()
-    {
-      $this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME'] ?? null);
-    }
+	/**
+	* The class constructor.
+	*/
+	function __construct()
+	{
+
+	}
 
     /**
      * assigns values to template variables
@@ -904,7 +884,7 @@ class Engine
 	$smarty_compiler->right_delimiter   = $this->right_delimiter;
 	$smarty_compiler->_version	  = $this->_version;
 
-	$smarty_compiler->securityPolicy = $this->securityPolicy();
+	$smarty_compiler->setSecurityPolicy( $this->getSecurityPolicy() );
 
 	$smarty_compiler->_reg_objects      = &$this->_reg_objects;
 	$smarty_compiler->_plugins	  = &$this->_plugins;
@@ -1351,7 +1331,7 @@ class Engine
 				* PHP functions directly, we only allow
 				* those specified in the security policy
 				*/
-				if (!$this->securityPolicy()->isModifierAllowed($_name))
+				if (!$this->getSecurityPolicy()->isModifierAllowed($_name))
 				{
 					throw new Exception\PluginException(
 						"(secure mode) modifier '{$_name}' is not allowed",
@@ -1396,24 +1376,5 @@ class Engine
 			$this->_plugins[$_type][$_name] =
 				array($_plugin_func, $_tpl_file, $_tpl_line, true, true);
 		}
-	}
-
-	/**
-	* @var Smarty2\Security
-	*/
-	protected SmartySecurity $securityPolicy;
-
-	protected function securityPolicy() : SmartySecurity
-	{
-		return ($this->securityPolicy ??
-			$this->securityPolicy = $this->security
-				? new SmartySecurity(
-					$this->security_settings['IF_FUNCS'],
-					$this->security_settings['MODIFIER_FUNCS'],
-					$this->security_settings['ALLOW_CONSTANTS'],
-					$this->security_settings['ALLOW_SUPER_GLOBALS'],
-				)
-				: new SmartySecurity()
-			);
 	}
 }
