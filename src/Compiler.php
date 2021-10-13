@@ -817,11 +817,23 @@ class Compiler extends Engine
 	$prefix = '';
 	$postfix = '';
 	$newline = '';
-	if(!is_object($this->_reg_objects[$object][0])) {
-	    $this->_trigger_fatal_error("registered '$object' is not an object" , $this->_current_file, $this->_current_line_no, __FILE__, __LINE__);
-	} elseif(!empty($this->_reg_objects[$object][1]) && !in_array($obj_comp, $this->_reg_objects[$object][1])) {
-	    $this->_trigger_fatal_error("'$obj_comp' is not a registered component of object '$object'", $this->_current_file, $this->_current_line_no, __FILE__, __LINE__);
-	} elseif(method_exists($this->_reg_objects[$object][0], $obj_comp)) {
+	if(!is_object($this->_reg_objects[$object][0]))
+	{
+	    throw new BadSyntaxException(
+		    "registered '{$object}' is not an object" ,
+		    $this->_current_file,
+		    $this->_current_line_no
+	    	);
+	} else
+	if(!empty($this->_reg_objects[$object][1]) && !in_array($obj_comp, $this->_reg_objects[$object][1]))
+	{
+	    throw new BadSyntaxException(
+		    "'{$obj_comp}' is not a registered component of object '{$object}'",
+		    $this->_current_file,
+		    $this->_current_line_no
+	    );
+	} else
+	if(method_exists($this->_reg_objects[$object][0], $obj_comp)) {
 	    // method
 	    if(in_array($obj_comp, $this->_reg_objects[$object][3])) {
 		// block method
@@ -1815,8 +1827,12 @@ class Compiler extends Engine
 	    if (empty($this->_plugins['modifier'][$_modifier_name])
 		&& !$this->_get_plugin_filepath('modifier', $_modifier_name)
 		&& function_exists($_modifier_name)) {
-		if ($this->security && !in_array($_modifier_name, $this->security_settings['MODIFIER_FUNCS'])) {
-		    $this->_trigger_fatal_error("[plugin] (secure mode) modifier '$_modifier_name' is not allowed" , $this->_current_file, $this->_current_line_no, __FILE__, __LINE__);
+		if ($this->security && !in_array($_modifier_name, $this->security_settings['MODIFIER_FUNCS']))
+		{
+		    throw new BadSyntaxException((
+			    "[plugin] (secure mode) modifier '{$_modifier_name}' is not allowed" ,
+			    $this->_current_file, $this->_current_line_no
+		    	);
 		} else {
 		    $this->_plugins['modifier'][$_modifier_name] = array($_modifier_name,  null, null, false);
 		}
