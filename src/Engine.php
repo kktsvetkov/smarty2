@@ -900,14 +900,12 @@ class Engine
     {
 	$smarty_compiler = new $this->compiler_class;
 
-	$smarty_compiler->force_compile     = $this->force_compile;
 	$smarty_compiler->left_delimiter    = $this->left_delimiter;
 	$smarty_compiler->right_delimiter   = $this->right_delimiter;
 	$smarty_compiler->_version	  = $this->_version;
 
 	$smarty_compiler->securityPolicy = $this->securityPolicy();
 
-	$smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
 	$smarty_compiler->_reg_objects      = &$this->_reg_objects;
 	$smarty_compiler->_plugins	  = &$this->_plugins;
 	$smarty_compiler->_tpl_vars	 = &$this->_tpl_vars;
