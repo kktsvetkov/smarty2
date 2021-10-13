@@ -898,12 +898,7 @@ class Engine
      */
     function _compile_source($resource_name, &$source_content, &$compiled_content)
     {
-
 	$smarty_compiler = new $this->compiler_class;
-
-	$smarty_compiler->template_dir      = $this->template_dir;
-	$smarty_compiler->compile_dir       = $this->compile_dir;
-	$smarty_compiler->plugins_dir       = $this->plugins_dir;
 
 	$smarty_compiler->force_compile     = $this->force_compile;
 	$smarty_compiler->left_delimiter    = $this->left_delimiter;
