@@ -246,7 +246,7 @@ class Engine
 	*/
 	function __construct()
 	{
-		$this->setCompiledDepot( $this->loadCompiledDepot() );
+
 	}
 
     /**
@@ -780,7 +780,13 @@ class Engine
 		return $this->getDefaultPluginProvider()->getFilepath($type, $name);
 	}
 
-	protected function loadCompiledDepot() : Depot\LegacyDepot
+	function getCompiledDepot() : Depot\DepotInterface
+	{
+		return $this->compiledDepot ??
+			( $this->compiledDepot = $this->loadDefaultCompiledDepot() );
+	}
+
+	protected function loadDefaultCompiledDepot() : Depot\LegacyDepot
 	{
 		return new Depot\LegacyDepot(
 			$this->compile_dir,
