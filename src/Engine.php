@@ -139,7 +139,7 @@ class Engine
      *
      * @var array
      */
-    public string $default_resource_type    = 'file';
+    public string $default_resource_type = 'file';
 
     /**
      * This indicates which filters are automatically loaded into Smarty.
@@ -931,7 +931,10 @@ class Engine
 		// split resource type from resrouce name
 		//
 		[$_resource_type, $_resource_name] =
-			$this->_parse_resource_name($params['resource_name']);
+			Kit\Resources::parseResourceName(
+				$params['resource_name'],
+				$this->default_resource_type
+			);
 
 		// unknown resource type ?
 		//
@@ -1007,41 +1010,6 @@ class Engine
 		}
 
 		return $_return;
-	}
-
-	/**
-	* Parse the type and name from the resource; if resource type is
-	* omitted, {@link $smarty->default_resource_type} is used instead
-	*
-	* @param string $resource_name
-	* @return array with two elements, type and name
-	*/
-	protected function _parse_resource_name(string $resource_name)
-	{
-		// split tpl_path by the first colon
-		$_resource_name_parts = explode(':', $resource_name, 2);
-
-		// no resource type given
-		//
-		if (count($_resource_name_parts) == 1)
-		{
-			return array(
-				$this->default_resource_type,
-				$_resource_name_parts[0]
-			);
-		}
-
-		// silly windows: 1 char is not resource type, but part of filepath
-		//
-		if(strlen($_resource_name_parts[0]) == 1)
-		{
-			return array(
-				$this->default_resource_type,
-				$resource_name
-			);
-		}
-
-		return $_resource_name_parts;
 	}
 
 	/**
