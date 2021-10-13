@@ -2,7 +2,7 @@
 
 namespace Smarty2;
 
-use Smarty2\Security\Policy as SecurityPolicy;
+use Smarty2\Security\LegacyPolicy as SecurityPolicy;
 
 /**
 * Legacy Smarty2 - the PHP template engine
@@ -44,20 +44,32 @@ class Legacy extends Engine
 	function __construct()
 	{
 		$this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME'] ?? null);
+	}
 
-		$this->setSecurityPolicy( $this->loadSecurityPolicy() );
+	function getSecurityPolicy() : SecurityPolicy
+	{
+		return $this->securityPolicy ??
+			($this->securityPolicy = $this->loadSecurityPolicy());
 	}
 
 	protected function loadSecurityPolicy() : SecurityPolicy
 	{
+		$empty = array();
+		$null = null;
+
 		return $this->security
 			? new SecurityPolicy(
 				$this->security_settings['IF_FUNCS'],
 				$this->security_settings['MODIFIER_FUNCS'],
 				$this->security_settings['ALLOW_CONSTANTS'],
-				$this->security_settings['ALLOW_SUPER_GLOBALS'],
+				$this->security_settings['ALLOW_SUPER_GLOBALS']
 			)
-			: new SecurityPolicy();
+			: new SecurityPolicy(
+				$empty,
+				$empty,
+				$null,
+				$null
+			);
 	}
 
 	/**#@+
