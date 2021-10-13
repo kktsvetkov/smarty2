@@ -1706,17 +1706,11 @@ class Compiler extends Engine
 		    else
 			$_output .= "['" . substr($_index, 1) . "']";
 		} else if (substr($_index,0,2) == '->') {
-		    if(substr($_index,2,2) == '__') {
-			$this->_syntax_error('call to internal object members is not allowed');
-		    } elseif($this->security && substr($_index, 2, 1) == '_') {
-			$this->_syntax_error('(secure) call to private object member is not allowed');
-		    } elseif (substr($_index, 2, 1) == '$') {
-			if ($this->security) {
-			    $this->_syntax_error('(secure) call to dynamic object member is not allowed');
-			} else {
+		    if (substr($_index, 2, 1) == '$') {
+
 			    $_output .= '->{(($_var=$this->_tpl_vars[\''.substr($_index,3)
 				    . '\']) && substr($_var,0,2)!=\'__\') ? $_var : $this->trigger_error("cannot access property \\"$_var\\"")}';
-			}
+
 		    } else {
 			$_output .= $_index;
 		    }
