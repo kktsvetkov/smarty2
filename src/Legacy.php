@@ -43,6 +43,7 @@ class Legacy extends Engine
 	*/
 	function __construct()
 	{
+		parent::__construct();
 		$this->assign('SCRIPT_NAME', $_SERVER['SCRIPT_NAME'] ?? null);
 	}
 

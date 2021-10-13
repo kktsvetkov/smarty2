@@ -12,6 +12,7 @@ use Smarty2\Security\Policy as SecurityPolicy;
 */
 class Engine
 {
+	use Depot\DepotAwareTrait;
 	use Engine\ConfigVarsTrait;
 	use Engine\RegisteredObjectsTrait;
 	use Security\PolicyAwareTrait;
@@ -245,7 +246,7 @@ class Engine
 	*/
 	function __construct()
 	{
-
+		$this->setCompiledDepot( $this->loadCompiledDepot() );
 	}
 
     /**
@@ -779,19 +780,12 @@ class Engine
 		return $this->getDefaultPluginProvider()->getFilepath($type, $name);
 	}
 
-	/**
-	* @var Smarty2\Depot\LegacyDepot
-	*/
-	protected Depot\LegacyDepot $defaultCompiledDepot;
-
-	protected function getCompiledDepot() : Depot\LegacyDepot
+	protected function loadCompiledDepot() : Depot\LegacyDepot
 	{
-		return ($this->defaultCompiledDepot ??
-			$this->defaultCompiledDepot =
-				new Depot\LegacyDepot(
-					$this->compile_dir,
-					$this->use_sub_dirs
-				));
+		return new Depot\LegacyDepot(
+			$this->compile_dir,
+			$this->use_sub_dirs
+		);
 	}
 
 	/**
