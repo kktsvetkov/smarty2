@@ -3,6 +3,7 @@
 namespace Smarty2;
 
 use Smarty2\Exception;
+use Smarty2\Security as SmartySecurity;
 
 /**
 * Smarty2 - the PHP template engine
@@ -79,32 +80,28 @@ class Engine
      */
     public bool $force_compile   =  false;
 
-    /**
-     * This enables template security. When enabled, many things are restricted
-     * in the templates that normally would go unchecked. This is useful when
-     * untrusted parties are editing templates and you want a reasonable level
-     * of security. (no direct execution of PHP in templates for example)
-     *
-     * @var boolean
-     */
-    public bool $security       =   false;
+	/**
+	* This enables template security. When enabled, many things are restricted
+	* in the templates that normally would go unchecked. This is useful when
+	* untrusted parties are editing templates and you want a reasonable level
+	* of security. (no direct execution of PHP in templates for example)
+	*
+	* @var boolean
+	*/
+	public bool $security = false;
 
-    /**
-     * These are the security settings for Smarty. They are used only when
-     * {@link $security} is enabled.
-     *
-     * @var array
-     */
-    public array $security_settings  = array(
-	    'IF_FUNCS'	=> array('array', 'list',
-				       'isset', 'empty',
-				       'count', 'sizeof',
-				       'in_array', 'is_array',
-				       'true', 'false', 'null'),
-	    'MODIFIER_FUNCS'  => array('count'),
-	    'ALLOW_CONSTANTS'  => false,
-	    'ALLOW_SUPER_GLOBALS' => true
-	   );
+	/**
+	* These are the security settings for Smarty. They are used only when
+	* {@link Smarty2\Engine::$security} is enabled.
+	*
+	* @var array
+	*/
+	public array $security_settings  = array(
+		'IF_FUNCS' => SmartySecurity::DEFAULT_IF_FUNCS,
+		'MODIFIER_FUNCS' => SmartySecurity::DEFAULT_MODIFIER_FUNCS,
+		'ALLOW_CONSTANTS' => false,
+		'ALLOW_SUPER_GLOBALS' => true
+		);
 
     /**
      * The left delimiter used for the template tags.
@@ -912,9 +909,8 @@ class Engine
 	$smarty_compiler->left_delimiter    = $this->left_delimiter;
 	$smarty_compiler->right_delimiter   = $this->right_delimiter;
 	$smarty_compiler->_version	  = $this->_version;
-	$smarty_compiler->security	  = $this->security;
 
-	$smarty_compiler->security_settings = $this->security_settings;
+	$smarty_compiler->securityPolicy = $this->securityPolicy();
 
 	$smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
 	$smarty_compiler->_reg_objects      = &$this->_reg_objects;
@@ -1358,13 +1354,11 @@ class Engine
 			if (!$_plugin_file && ($_type == 'modifier') && function_exists($_name))
 			{
 				/*
-				* In case modifier falls back on using PHP functions
-				* directly, we only allow those specified in the security
-				* context.
+				* In case modifier falls back on using
+				* PHP functions directly, we only allow
+				* those specified in the security policy
 				*/
-				if ($this->security && !in_array(
-					$_name,
-					$this->security_settings['MODIFIER_FUNCS']))
+				if (!$this->securityPolicy()->isModifierAllowed($_name))
 				{
 					throw new Exception\PluginException(
 						"(secure mode) modifier '{$_name}' is not allowed",
@@ -1409,5 +1403,24 @@ class Engine
 			$this->_plugins[$_type][$_name] =
 				array($_plugin_func, $_tpl_file, $_tpl_line, true, true);
 		}
+	}
+
+	/**
+	* @var Smarty2\Security
+	*/
+	protected SmartySecurity $securityPolicy;
+
+	protected function securityPolicy() : SmartySecurity
+	{
+		return ($this->securityPolicy ??
+			$this->securityPolicy = $this->security
+				? new SmartySecurity(
+					$this->security_settings['IF_FUNCS'],
+					$this->security_settings['MODIFIER_FUNCS'],
+					$this->security_settings['ALLOW_CONSTANTS'],
+					$this->security_settings['ALLOW_SUPER_GLOBALS'],
+				)
+				: new SmartySecurity()
+			);
 	}
 }

@@ -1310,20 +1310,32 @@ class Compiler extends Engine
 		default:
 		    if(preg_match('~^' . $this->_func_regexp . '$~', $token) ) {
 			    // function call
-			    if($this->security &&
-			       !in_array($token, $this->security_settings['IF_FUNCS'])) {
-				$this->_syntax_error("(secure mode) '$token' not allowed in if statement");
+			    if(!$this->securityPolicy()->isIfFunctionAllowed($token))
+			     {
+				throw new BadSyntaxException(
+					"(security) '{$token}' not allowed in IF statement",
+					$this->_current_file,
+					$this->_current_line_no
+				);
 			    }
 		    } elseif(preg_match('~^' . $this->_var_regexp . '$~', $token) && (strpos('+-*/^%&|', substr($token, -1)) === false) && isset($tokens[$i+1]) && $tokens[$i+1] == '(') {
 			// variable function call
-			$this->_syntax_error("variable function call '$token' not allowed in if statement");
+				throw new BadSyntaxException(
+					"variable function call '{$token}' not allowed in if statement",
+					$this->_current_file,
+					$this->_current_line_no
+				);
 		    } elseif(preg_match('~^' . $this->_obj_call_regexp . '|' . $this->_var_regexp . '(?:' . $this->_mod_regexp . '*)$~', $token)) {
 			// object or variable
 			$token = $this->_parse_var_props($token);
 		    } elseif(is_numeric($token)) {
 			// number, skip it
 		    } else {
-			$this->_syntax_error("unidentified token '$token'");
+				throw new BadSyntaxException(
+					"unidentified token '{$token}'",
+					$this->_current_file,
+					$this->_current_line_no
+				);
 		    }
 		    break;
 	    }
@@ -1821,14 +1833,15 @@ class Compiler extends Engine
 	    if (empty($this->_plugins['modifier'][$_modifier_name])
 		&& !$this->_get_plugin_filepath('modifier', $_modifier_name)
 		&& function_exists($_modifier_name)) {
-		if ($this->security && !in_array($_modifier_name, $this->security_settings['MODIFIER_FUNCS']))
+		if (!$this->securityPolicy()->isModifierAllowed($_modifier_name))
 		{
 		    throw new BadSyntaxException(
-			    "[plugin] (secure mode) modifier '{$_modifier_name}' is not allowed" ,
+			    "(security) modifier '{$_modifier_name}' is not allowed" ,
 			    $this->_current_file, $this->_current_line_no
 		    	);
 		} else {
-		    $this->_plugins['modifier'][$_modifier_name] = array($_modifier_name,  null, null, false);
+		    $this->_plugins['modifier'][$_modifier_name] = array(
+			    $_modifier_name,  null, null, false);
 		}
 	    }
 	    $this->_add_plugin('modifier', $_modifier_name);
@@ -1942,57 +1955,100 @@ class Compiler extends Engine
 		break;
 
 	    case 'get':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_GET';
 		}
-		$compiled_ref = "\$_GET";
 		break;
 
 	    case 'post':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_POST';
 		}
-		$compiled_ref = "\$_POST";
 		break;
 
 	    case 'cookies':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_COOKIE';
 		}
-		$compiled_ref = "\$_COOKIE";
 		break;
 
 	    case 'env':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_ENV';
 		}
-		$compiled_ref = "\$_ENV";
 		break;
 
 	    case 'server':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_SERVER';
 		}
-		$compiled_ref = "\$_SERVER";
+
 		break;
 
 	    case 'session':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_SESSION';
 		}
-		$compiled_ref = "\$_SESSION";
 		break;
 
 	    /*
@@ -2000,15 +2056,21 @@ class Compiler extends Engine
 	     * compiler.
 	     */
 	    case 'request':
-		if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
-		    $this->_syntax_error("(secure mode) super global access not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
-		}
-		    $compiled_ref = "\$_REQUEST";
-		    break;
+	    	if (!$this->securityPolicy()->areSuperGlobalsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Super Globals Access Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
 
-		return null;
+			$compiled_ref = '([])';
+		} else
+		{
+			$compiled_ref = '$_REQUEST';
+		}
+
+		break;
 
 	    case 'capture':
 		return null;
@@ -2024,11 +2086,17 @@ class Compiler extends Engine
 		break;
 
 	    case 'const':
-		if ($this->security && !$this->security_settings['ALLOW_CONSTANTS']) {
-		    $this->_syntax_error("(secure mode) constants not permitted",
-					 E_USER_WARNING, __FILE__, __LINE__);
-		    return;
+	    	if (!$this->securityPolicy()->areConstantsAllowed())
+		{
+			$this->securityPolicy()->issueWarning(
+				'Constants Not Permitted',
+				$this->_current_file,
+				$this->_current_line_no
+			);
+
+			return;
 		}
+
 		array_shift($indexes);
 		if (preg_match('!^\.\w+$!', $indexes[0])) {
 		    $compiled_ref = '@' . substr($indexes[0], 1);

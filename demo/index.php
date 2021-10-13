@@ -9,6 +9,7 @@ $smarty->compile_dir = __DIR__ . '/templates_c';
 
 $smarty->compile_check = true;
 $smarty->debugging = true;
+$smarty->security = true;
 
 $smarty->assign("Name","Fred Irving Johnathan Bradley Peppergill");
 $smarty->assign("FirstName",array("John","Mary","James","Henry"));
