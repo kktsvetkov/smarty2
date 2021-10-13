@@ -2,6 +2,8 @@
 
 namespace Smarty2\Engine;
 
+use Smarty2\Exception;
+
 trait RegisteredObjectsTrait
 {
 	/**
@@ -58,14 +60,14 @@ trait RegisteredObjectsTrait
 	{
 		if (!isset($this->_reg_objects[$name]))
 		{
-			$this->_trigger_fatal_error(
+			throw new Exception\RegisteredObjectException(
 				"'$name' is not a registered object"
 			);
 		}
 
 		if (!is_object($this->_reg_objects[$name][0]))
 		{
-			$this->_trigger_fatal_error(
+			throw new Exception\RegisteredObjectException(
 				"registered '$name' is not an object"
 			);
 		}
