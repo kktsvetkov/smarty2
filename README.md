@@ -78,9 +78,6 @@ Some of Smarty's features:
 * template if/elseif/else/endif constructs are passed to the PHP parser,
   so the if syntax can be as simple or as complex as you like.
 * unlimited nesting of sections, conditionals, etc. allowed
-* it is possible to embed PHP code right in your template files,
-  although not recommended and doubtfully needed since the engine
-  is so customizable.
 * and many more.
 
 ## Resources
