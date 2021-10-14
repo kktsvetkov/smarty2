@@ -14,9 +14,9 @@ use function uniqid;
 class LegacyProviderTest extends TestCase
 {
 	/**
-	* @covers LegacyProvider::getPluginDirs()
-	* @covers LegacyProvider::addPluginDir()
-	* @covers LegacyProvider::__construct()
+	* @covers Smarty2\Provider\LegacyProvider::getPluginDirs()
+	* @covers Smarty2\Provider\LegacyProvider::addPluginDir()
+	* @covers Smarty2\Provider\LegacyProvider::__construct()
 	*/
 	function testConstructorWithDefaultEmptyArgument()
 	{
@@ -28,8 +28,8 @@ class LegacyProviderTest extends TestCase
 	}
 
 	/**
-	* @covers LegacyProvider::addPluginDir()
-	* @covers LegacyProvider::__construct()
+	* @covers Smarty2\Provider\LegacyProvider::addPluginDir()
+	* @covers Smarty2\Provider\LegacyProvider::__construct()
 	*/
 	function testConstructorWithSemigoodArgument()
 	{
@@ -42,8 +42,8 @@ class LegacyProviderTest extends TestCase
 	}
 
 	/**
-	* @covers LegacyProvider::getPluginDirs()
-	* @covers LegacyProvider::addPluginDir()
+	* @covers Smarty2\Provider\LegacyProvider::getPluginDirs()
+	* @covers Smarty2\Provider\LegacyProvider::addPluginDir()
 	*/
 	function testAddPluginDir()
 	{
@@ -61,8 +61,8 @@ class LegacyProviderTest extends TestCase
 	}
 
 	/**
-	* @covers LegacyProvider::getPluginDirs()
-	* @covers LegacyProvider::addPluginDir()
+	* @covers Smarty2\Provider\LegacyProvider::getPluginDirs()
+	* @covers Smarty2\Provider\LegacyProvider::addPluginDir()
 	*/
 	function testAddPluginDirWithPrepend()
 	{
@@ -76,7 +76,7 @@ class LegacyProviderTest extends TestCase
 	}
 
 	/**
-	* @covers LegacyProvider::getFilepath()
+	* @covers Smarty2\Provider\LegacyProvider::getFilepath()
 	*/
 	function testGetFilepath()
 	{
