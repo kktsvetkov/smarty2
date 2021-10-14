@@ -1015,24 +1015,6 @@ class Engine
 
 		// unknown resource type ?
 		//
-		if (empty($this->_plugins['resource'][ $_resource_type ]))
-		{
-			try {
-				$this->_load_resource_plugin( $_resource_type );
-			}
-			catch (Exception\ResourceException $e)
-			{
-				if ($params['quiet'])
-				{
-					return false;
-				}
-
-				throw $e;
-			}
-		}
-
-		// unknown resource type ?
-		//
 		if (!$resource = $this->getResourceAggregate()->getType( $_resource_type ))
 		{
 			try {
@@ -1104,65 +1086,6 @@ class Engine
 			}
 		}
 		*/
-	}
-
-	/**
-	* Load a resource plugin
-	*
-	* @param string $type
-	* @return boolean
-	* @throws Smarty2\Exception\ResourceException
-	*/
-	protected function _load_resource_plugin(string $type)
-	{
-		/*
-		* Resource plugins are not quite like the other ones, so they are
-		* handled differently. The first element of plugin info is the array of
-		* functions provided by the plugin, the second one indicates whether
-		* all of them exist or not.
-		*/
-		if (!empty($this->_plugins['resource'][ $type ]))
-		{
-			return false; /* already loaded */
-		}
-
-		// load from resource.$type.php file
-		//
-		$_plugin_file = $this->_get_plugin_filepath('resource', $type);
-		if ($_plugin_file)
-		{
-			/*
-			* If the plugin file is found, it -must- provide the
-			* properly named plugin functions.
-			*/
-			include_once($_plugin_file);
-
-			/*
-			* Locate functions that we require the plugin to provide.
-			*/
-			$_resource_ops = array('source', 'timestamp', 'secure', 'trusted');
-			$_resource_funcs = array();
-			foreach ($_resource_ops as $_op)
-			{
-				$_plugin_func = 'smarty_resource_' . $type . '_' . $_op;
-				if (function_exists($_plugin_func))
-				{
-					$_resource_funcs[] = $_plugin_func;
-					continue;
-				}
-
-				throw new Exception\ResourceException(
-					"Function {$_plugin_func}() not found in {$_plugin_file}"
-					);
-			}
-
-			$this->_plugins['resource'][ $type ] = array($_resource_funcs, true);
-			return true;
-		}
-
-		throw new Exception\ResourceException(
-			"Resource '{$type}' is not implemented"
-			);
 	}
 
     /**
