@@ -4,29 +4,23 @@ namespace Smarty2\Resource;
 
 use Smarty2\Engine as Smarty;
 use Smarty2\Exception;
-use Smarty2\Resource\ResourceInterface;
-use Smarty2\Resource\CallbackResourceTrait;
+use Smarty2\Resource\CustomResource;
 
 use function function_exists;
 
-class PluginResource implements ResourceInterface
+class PluginResource extends CustomResource
 {
-	use CallbackResourceTrait;
-
-	function __construct(string $type, Smarty $smarty)
-	{
-		$this->loadResourcePlugin($type, $smarty);
-	}
-
 	/**
-	* Load a resource plugin
+	* Loads a resource plugin
 	*
 	* @param string $type
-	* @return boolean
+	* @param Smarty $smarty
 	* @throws Smarty2\Exception\ResourceException
 	*/
-	protected function loadResourcePlugin(string $type, Smarty $smarty)
+	function __construct(string $type, Smarty $smarty)
 	{
+		$this->smarty = $smarty;
+
 		/*
 		* Resource plugins are not quite like the other ones, so they are
 		* handled differently. The first element of plugin info is the array of
@@ -37,7 +31,7 @@ class PluginResource implements ResourceInterface
 		// load from resource.$type.php file
 		//
 		$plugin_resource_file = $smarty->_get_plugin_filepath('resource', $type);
-		if ($plugin_resource_file)
+		if (!$plugin_resource_file)
 		{
 			throw new Exception\ResourceException(
 				"Resource '{$type}' is not implemented as resource plugin"
@@ -50,6 +44,8 @@ class PluginResource implements ResourceInterface
 		*/
 		include_once($plugin_resource_file);
 
+		// smarty_resource_{$type}_source first ...
+		//
 		$sourceCallback = "smarty_resource_{$type}_source";
 		if (!function_exists($sourceCallback))
 		{
@@ -57,9 +53,10 @@ class PluginResource implements ResourceInterface
 				"Function {$sourceCallback}() not found in {$plugin_resource_file}"
 				);
 		}
+		$this->sourceCallback = $sourceCallback;
 
-		$this->setSourceCallback($sourceCallback);
-
+		// ... and smarty_resource_{$type}_timestamp second.
+		//
 		$timestampCallback = "smarty_resource_{$type}_timestamp";
 		if (!function_exists($timestampCallback))
 		{
@@ -67,7 +64,6 @@ class PluginResource implements ResourceInterface
 				"Function {$timestampCallback}() not found in {$plugin_resource_file}"
 				);
 		}
-
-		$this->setTimestampCallback($timestampCallback);
+		$this->timestampCallback = $timestampCallback;
 	}
 }
