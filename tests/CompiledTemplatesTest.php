@@ -11,13 +11,14 @@ class CompiledTemplatesTest extends TestCase
 {
 	/**
 	* @covers Smarty2\Engine::clear_compiled_tpl()
-	* @covers Smarty2\Engine::_get_compile_path()
 	* @covers Smarty2\Engine::_is_compiled()
 	*/
 	function testClearCompiledTemplate()
 	{
 		$tpl_file = 'CompiledTemplatesTest.tpl';
-		$smarty_compile_tpl = $this->smarty->_get_compile_path($tpl_file);
+		$smarty_compile_tpl = $this->smarty
+			->getCompiledDepot()
+			->getCompiledFilename($tpl_file);
 
 		// make sure we start fresh
 		//

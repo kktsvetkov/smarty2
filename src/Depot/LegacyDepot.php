@@ -36,7 +36,7 @@ class LegacyDepot implements DepotInterface
 		$this->useSubDirs = $useSubDirs;
 	}
 
-	function getCompiledFilename(string $name, string $compile_id) : string
+	function getCompiledFilename(string $name, string $compile_id = '') : string
 	{
 		$separator =  $this->useSubDirs ? DIRECTORY_SEPARATOR : '^';
 		$compiled = $this->compiledDir . DIRECTORY_SEPARATOR;

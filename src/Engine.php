@@ -565,19 +565,25 @@ class Engine
 	}
     }
 
-    /**
-     * clears compiled version of specified template resource
-     *
-     * @param string $tpl_file
-     * @param string $compile_id
-     * @param string $exp_time
-     * @return boolean results of {@link \Smarty2\Kit\Files::unlink()}
-     */
-    function clear_compiled_tpl($tpl_file, $compile_id = null, $exp_time = null)
-    {
-	$smarty_compile_tpl = $this->_get_compile_path($tpl_file, $compile_id);
-	return Kit\Files::unlink($smarty_compile_tpl, $exp_time);
-    }
+	/**
+	* clears compiled version of specified template resource
+	*
+	* @param string $tpl_file
+	* @param string $compile_id
+	* @param string $exp_time
+	* @return boolean results of {@link \Smarty2\Kit\Files::unlink()}
+	*/
+	function clear_compiled_tpl($tpl_file, $compile_id = null, $exp_time = null) : bool
+	{
+		$smarty_compile_tpl = $this
+			->getCompiledDepot()
+			->getCompiledFilename(
+				$tpl_file,
+				$compile_id ?? $this->compile_id
+				);
+
+		return Kit\Files::unlink($smarty_compile_tpl, $exp_time);
+	}
 
     /**
      * Checks whether requested template exists.
@@ -656,7 +662,9 @@ class Engine
 	    }
 	}
 
-	$_smarty_compile_path = $this->_get_compile_path($resource_name);
+	$_smarty_compile_path = $this
+		->getCompiledDepot()
+		->getCompiledFilename($resource_name, $compile_id);
 
 	// if we just need to display the results, don't perform output
 	// buffering - for speed
@@ -850,21 +858,6 @@ class Engine
 	return $_results;
     }
 
-	/**
-	* Get the compile path for this resource
-	*
-	* @param string $resource_name
-	* @param string $compile_id
-	* @return string
-	*/
-	function _get_compile_path($resource_name, $compile_id = null)
-	{
-	  	return $this->getCompiledDepot()->getCompiledFilename(
-			$resource_name,
-			$compile_id ?? $this->compile_id
-			);
-	}
-
 	protected Resource\AggregateInterface $resourceAggregate;
 
 	function getResourceAggregate() : Resource\AggregateInterface
@@ -901,10 +894,18 @@ class Engine
 		return $pluginResource;
 	}
 
+	/**
+	* Parses $name into a resource $type and $template
+	*
+	* If $name does not have a resource type in it, then
+	* the value from {@link Smarty2\Engine::$default_resource_type}
+	* will be used
+	*
+	* @param string $name
+	* @return array
+	*/
 	function parseResourceName(string $name) : array
 	{
-		// split resource type from resrouce name
-		//
 		return Kit\Resources::parseResourceName(
 			$name,
 			$this->default_resource_type
@@ -1082,8 +1083,11 @@ class Engine
 
 		$this->_tpl_vars = array_merge($this->_tpl_vars, $params['smarty_include_vars']);
 
-		$_smarty_compile_path = $this->_get_compile_path(
-			$params['smarty_include_tpl_file']
+		$_smarty_compile_path = $this
+			->getCompiledDepot()
+			->getCompiledFilename(
+				$params['smarty_include_tpl_file'],
+				$this->_compile_id
 			);
 
 		if ($this->_is_compiled($params['smarty_include_tpl_file'], $this->_compile_id)

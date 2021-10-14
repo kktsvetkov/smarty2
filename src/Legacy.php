@@ -139,6 +139,21 @@ class Legacy extends Engine
 		return $this;
 	}
 
+	/**
+	* Get the compile path for this resource
+	*
+	* @param string $resource_name
+	* @param string $compile_id
+	* @return string
+	*/
+	function _get_compile_path($resource_name, $compile_id = null) : string 
+	{
+	  	return $this->getCompiledDepot()->getCompiledFilename(
+			$resource_name,
+			$compile_id ?? $this->compile_id
+			);
+	}
+
 	/**#@+
 	* Deprecated Methods Section
 	*/
