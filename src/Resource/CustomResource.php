@@ -39,7 +39,7 @@ class CustomResource implements ResourceInterface
 		$sourceCallback = $this->sourceCallback;
 		$contents = '';
 
-		$sourceCallback( $name, &$contents, $this->smarty );
+		$sourceCallback( $name, $contents, $this->smarty );
 		return $contents;
 	}
 
@@ -48,7 +48,7 @@ class CustomResource implements ResourceInterface
 		$timestampCallback = $this->timestampCallback;
 		$timestamp = 0;
 
-		$timestampCallback( $name, &$timestamp, $this->smarty );
+		$timestampCallback( $name, $timestamp, $this->smarty );
 		return $timestamp;
 	}
 }
