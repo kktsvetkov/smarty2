@@ -238,7 +238,6 @@ class Engine
 				       'prefilter'     => array(),
 				       'postfilter'    => array(),
 				       'outputfilter'  => array(),
-				       'resource'      => array(),
 				       'insert'	=> array());
     /**#@-*/
 
@@ -466,12 +465,10 @@ class Engine
 		//
 		if (4 == count($functions))
 		{
-			$this->_plugins['resource'][$type] = array($functions, false);
-
 			$this->getResourceAggregate()->register($type,
 				new Resource\CustomResource(
-					$functions[0],
-					$functions[1]
+					$functions[0],	/* source */
+					$functions[1]	/* timestamp */
 					));
 			return $this;
 		}
@@ -486,18 +483,10 @@ class Engine
 		//
 		if (5 == count($functions))
 		{
-			$this->_plugins['resource'][$type] = array(
-				array(
-					array(&$functions[0], $functions[1]),
-					array(&$functions[0], $functions[2]),
-					array(&$functions[0], $functions[3]),
-					array(&$functions[0], $functions[4])
-				) ,false);
-
 			$this->getResourceAggregate()->register($type,
 				new Resource\CustomResource(
-					array(&$functions[0], $functions[1]),
-					array(&$functions[0], $functions[2])
+					array(&$functions[0], $functions[1]), /* source */
+					array(&$functions[0], $functions[2])  /* timestamp */
 					));
 
 			return $this;
@@ -517,10 +506,7 @@ class Engine
 	*/
 	function unregister_resource($type) : self
 	{
-		unset($this->_plugins['resource'][$type]);
-
 		$this->getResourceAggregate()->unregister($type);
-
 		return $this;
 	}
 
