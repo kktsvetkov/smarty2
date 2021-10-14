@@ -955,6 +955,23 @@ class Engine
 		return $this;
 	}
 
+	protected function getResource(string $type) : ?Resource\ResourceInterface
+	{
+		$resourceAggregate = $this->getResourceAggregate();
+
+		if ($resourceAggregate->hasType( $type ))
+		{
+			return $resourceAggregate->getType( $type );
+		}
+
+		// unknown resource type ? try it as plugin resource
+		//
+		$pluginResource = new Resource\PluginResource( $type, $this );
+		$resourceAggregate->register( $type, $pluginResource );
+
+		return $pluginResource;
+	}
+
 	function parseResourceName(string $name) : array
 	{
 		// split resource type from resrouce name
