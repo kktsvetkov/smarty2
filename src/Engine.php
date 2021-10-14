@@ -467,6 +467,12 @@ class Engine
 		if (4 == count($functions))
 		{
 			$this->_plugins['resource'][$type] = array($functions, false);
+
+			$this->getResourceAggregate()->register($type,
+				new Resource\CustomResource(
+					$functions[0],
+					$functions[1]
+					));
 			return $this;
 		}
 
@@ -487,6 +493,13 @@ class Engine
 					array(&$functions[0], $functions[3]),
 					array(&$functions[0], $functions[4])
 				) ,false);
+
+			$this->getResourceAggregate()->register($type,
+				new Resource\CustomResource(
+					array(&$functions[0], $functions[1]),
+					array(&$functions[0], $functions[2])
+					));
+
 			return $this;
 		}
 
@@ -505,6 +518,9 @@ class Engine
 	function unregister_resource($type) : self
 	{
 		unset($this->_plugins['resource'][$type]);
+
+		$this->getResourceAggregate()->unregister($type);
+
 		return $this;
 	}
 
