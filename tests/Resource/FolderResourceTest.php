@@ -11,9 +11,9 @@ use function trim;
 class FolderResourceTest extends TestCase
 {
 	/**
-	* @covers FolderResource::templateExists()
-	* @covers FolderResource::resolveTemplateName()
-	* @covers FolderResource::__construct()
+	* @covers Smarty2\Resource\FolderResource::templateExists()
+	* @covers Smarty2\Resource\FolderResource::resolveTemplateName()
+	* @covers Smarty2\Resource\FolderResource::__construct()
 	*/
 	function testTemplateExists()
 	{
@@ -39,9 +39,9 @@ class FolderResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FolderResource::getTemplateSource()
-	* @covers FolderResource::resolveTemplateName()
-	* @covers FolderResource::getRealFilepath()
+	* @covers Smarty2\Resource\FolderResource::getTemplateSource()
+	* @covers Smarty2\Resource\FolderResource::resolveTemplateName()
+	* @covers Smarty2\Resource\FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateSource()
 	{
@@ -56,9 +56,9 @@ class FolderResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FolderResource::getTemplateSource()
-	* @covers FolderResource::resolveTemplateName()
-	* @covers FolderResource::getRealFilepath()
+	* @covers Smarty2\Resource\FolderResource::getTemplateSource()
+	* @covers Smarty2\Resource\FolderResource::resolveTemplateName()
+	* @covers Smarty2\Resource\FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateSourceMissing()
 	{
@@ -71,9 +71,9 @@ class FolderResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FolderResource::getTemplateTimestamp()
-	* @covers FolderResource::resolveTemplateName()
-	* @covers FolderResource::getRealFilepath()
+	* @covers Smarty2\Resource\FolderResource::getTemplateTimestamp()
+	* @covers Smarty2\Resource\FolderResource::resolveTemplateName()
+	* @covers Smarty2\Resource\FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateTimestamp()
 	{
