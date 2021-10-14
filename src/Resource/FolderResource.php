@@ -13,7 +13,7 @@ use function is_file;
 use function is_readable;
 use function realpath;
 
-class FileResource implements ResourceInterface
+class FolderResource implements ResourceInterface
 {
 	protected string $templateDir;
 
