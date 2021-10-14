@@ -93,9 +93,17 @@ the existing resources, such as:
 - `CustomResource` is wrapper for the custom resource code from `register_resource()` method
 - `PluginResource` is a wrapper for plugin resources, e.g. `plugins/resource.file.php`
 
-The old `register_resource()` and `unregister_resource()` are preserved, and the
-custom callbacks used in them for the resources are used through the `CustomResource`
-class.
+Loaded resources are hosted in a `Smarty2\Resource\Aggregate` object, and this
+is the object you must use to register new resource object:
+```php
+$smarty->getResourceAggregate()->register('admin',
+	new Smarty2\Resource\FolderResource('admin/templates')
+	);
+```
+
+At the same time, the old `register_resource()` and `unregister_resource()` are
+preserved, and the custom callbacks used in them for the resources are used
+through the `CustomResource` class.
 
 ## Security
 
