@@ -939,6 +939,16 @@ class Engine
 		return $this;
 	}
 
+	function parseResourceName(string $name) : array
+	{
+		// split resource type from resrouce name
+		//
+		return Kit\Resources::parseResourceName(
+			$name,
+			$this->default_resource_type
+			);
+	}
+
 	/**
 	* fetch the template info. Gets timestamp, and source
 	* if get_source is true
@@ -962,10 +972,8 @@ class Engine
 
 		// split resource type from resrouce name
 		//
-		[$_resource_type, $_resource_name] =
-			Kit\Resources::parseResourceName(
-				$params['resource_name'],
-				$this->default_resource_type
+		[$_resource_type, $_resource_name] = $this->parseResourceName(
+			$params['resource_name']
 			);
 
 		// unknown resource type ?
