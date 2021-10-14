@@ -468,7 +468,8 @@ class Engine
 			$this->getResourceAggregate()->register($type,
 				new Resource\CustomResource(
 					$functions[0],	/* source */
-					$functions[1]	/* timestamp */
+					$functions[1],	/* timestamp */
+					$this
 					));
 			return $this;
 		}
@@ -486,7 +487,8 @@ class Engine
 			$this->getResourceAggregate()->register($type,
 				new Resource\CustomResource(
 					array(&$functions[0], $functions[1]), /* source */
-					array(&$functions[0], $functions[2])  /* timestamp */
+					array(&$functions[0], $functions[2]),  /* timestamp */
+					$this
 					));
 
 			return $this;
