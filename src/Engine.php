@@ -48,7 +48,7 @@ class Engine
      *
      * @var array
      */
-    public array $plugins_dir     =  array('plugins');
+    public array $plugins_dir =  array(SMARTY_DIR . 'plugins');
 
     /**
      * If debugging is enabled, debugging stats will be collected in
@@ -767,11 +767,11 @@ class Engine
 
 	protected function getDefaultPluginProvider() : Provider\LegacyProvider
 	{
-		return ($this->defaultPluginProvider ??
-			$this->defaultPluginProvider =
-				new Provider\LegacyProvider(
+		return $this->defaultPluginProvider ??
+			($this->defaultPluginProvider =
+				new Provider\LegacyProvider)->linkPluginDirs(
 					$this->plugins_dir
-				));
+				);
 	}
 
 	/**
@@ -900,6 +900,7 @@ class Engine
 	$smarty_compiler->_version	  = $this->_version;
 
 	$smarty_compiler->setSecurityPolicy( $this->getSecurityPolicy() );
+	$smarty_compiler->defaultPluginProvider = $this->getDefaultPluginProvider();
 
 	$smarty_compiler->_reg_objects      = &$this->_reg_objects;
 	$smarty_compiler->_plugins	  = &$this->_plugins;

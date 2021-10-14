@@ -38,6 +38,21 @@ class LegacyProvider
 	}
 
 	/**
+	* Link the list of plugin dirs by reference
+	*
+	* This allows us to use {@link $smarty->plugin_dirs} values as
+	* they get modified after the object is created
+	*
+	* @param array $pluginDirs
+	* @return self
+	*/
+	function linkPluginDirs(array &$pluginDirs) : self
+	{
+		$this->pluginDirs = $pluginDirs;
+		return $this;
+	}
+
+	/**
 	* Get the list of plugin directories
 	* @return array
 	*/
