@@ -719,14 +719,14 @@ class Engine
 	// if we just need to display the results, don't perform output
 	// buffering - for speed
 	if ($display && count($this->_plugins['outputfilter']) == 0) {
-	    if ($this->_is_compiled($resource_name, $_smarty_compile_path)
+	    if ($this->_is_compiled($resource_name, $this->_compile_id)
 		    || $this->_compile_resource($resource_name, $_smarty_compile_path))
 	    {
 		include($_smarty_compile_path);
 	    }
 	} else {
 	    ob_start();
-	    if ($this->_is_compiled($resource_name, $_smarty_compile_path)
+	    if ($this->_is_compiled($resource_name, $this->_compile_id)
 		    || $this->_compile_resource($resource_name, $_smarty_compile_path))
 	    {
 		include($_smarty_compile_path);
@@ -798,11 +798,16 @@ class Engine
 	* test if resource needs compiling
 	*
 	* @param string $resource_name
-	* @param string $compile_path
+	* @param string $compile_id
 	* @return boolean
 	*/
-	function _is_compiled($resource_name, $compile_path)
+	function _is_compiled($resource_name, $compile_id = null)
 	{
+		if (!isset($compile_id))
+		{
+			$compile_id = $this->compile_id;
+		}
+
 		/*
 		* note that if the same template is included
 		* multiple times within the same script, it
@@ -814,15 +819,19 @@ class Engine
 			return false;
 		}
 
-		if (!is_file($compile_path))
-		{
-			return false;
-		}
-
 		// no need to check compiled file
 		if (!$this->compile_check)
 		{
 			return true;
+		}
+
+		$compile_path = $this->getCompiledDepot()->getCompiledFilename(
+			$resource_name,
+			$compile_id
+			);
+		if (!is_file($compile_path))
+		{
+			return false;
 		}
 
 		// get file source and timestamp
@@ -1150,7 +1159,7 @@ class Engine
 			$params['smarty_include_tpl_file']
 			);
 
-		if ($this->_is_compiled($params['smarty_include_tpl_file'], $_smarty_compile_path)
+		if ($this->_is_compiled($params['smarty_include_tpl_file'], $this->_compile_id)
 			|| $this->_compile_resource($params['smarty_include_tpl_file'], $_smarty_compile_path))
 		{
 			include($_smarty_compile_path);

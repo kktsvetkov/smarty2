@@ -26,13 +26,13 @@ class CompiledTemplatesTest extends TestCase
 			unlink($smarty_compile_tpl);
 		}
 		$this->assertFalse( is_file($smarty_compile_tpl) );
-		$this->assertFalse( $this->smarty->_is_compiled($tpl_file, $smarty_compile_tpl) );
+		$this->assertFalse( $this->smarty->_is_compiled($tpl_file) );
 
 		// check if the compiled file is there
 		//
 		$this->smarty->fetch($tpl_file);
 		$this->assertTrue( is_file($smarty_compile_tpl) );
-		$this->assertTrue( $this->smarty->_is_compiled($tpl_file, $smarty_compile_tpl) );
+		$this->assertTrue( $this->smarty->_is_compiled($tpl_file) );
 
 		// clean it up
 		//
