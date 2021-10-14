@@ -3,21 +3,21 @@
 namespace Smarty2\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Smarty2\Resource\FileResource;
+use Smarty2\Resource\FolderResource;
 use Smarty2\Exception;
 
 use function trim;
 
-class FileResourceTest extends TestCase
+class FolderResourceTest extends TestCase
 {
 	/**
-	* @covers FileResource::templateExists()
-	* @covers FileResource::resolveTemplateName()
-	* @covers FileResource::__construct()
+	* @covers FolderResource::templateExists()
+	* @covers FolderResource::resolveTemplateName()
+	* @covers FolderResource::__construct()
 	*/
 	function testTemplateExists()
 	{
-		$resource = new FileResource(
+		$resource = new FolderResource(
 			__DIR__ . '/../templates'
 			);
 
@@ -26,7 +26,7 @@ class FileResourceTest extends TestCase
 			'proba.tpl' => false,
 			'Resources' => false,
 			'Resources/' => false,
-			'Resources/FileResource.tpl' => true,
+			'Resources/FolderResource.tpl' => true,
 			'Resources/proba.html' => false,
 			);
 		foreach ($templates as $template => $result)
@@ -39,16 +39,16 @@ class FileResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FileResource::getTemplateSource()
-	* @covers FileResource::resolveTemplateName()
-	* @covers FileResource::getRealFilepath()
+	* @covers FolderResource::getTemplateSource()
+	* @covers FolderResource::resolveTemplateName()
+	* @covers FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateSource()
 	{
-		$resource = new FileResource(
+		$resource = new FolderResource(
 			__DIR__ . '/../templates'
 			);
-		$source = $resource->getTemplateSource('Resources/FileResource.tpl');
+		$source = $resource->getTemplateSource('Resources/FolderResource.tpl');
 		$this->assertEquals(
 			trim( $source ),
 			'{$smarty.template}'
@@ -56,13 +56,13 @@ class FileResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FileResource::getTemplateSource()
-	* @covers FileResource::resolveTemplateName()
-	* @covers FileResource::getRealFilepath()
+	* @covers FolderResource::getTemplateSource()
+	* @covers FolderResource::resolveTemplateName()
+	* @covers FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateSourceMissing()
 	{
-		$resource = new FileResource(
+		$resource = new FolderResource(
 			__DIR__ . '/../templates'
 			);
 
@@ -71,16 +71,16 @@ class FileResourceTest extends TestCase
 	}
 
 	/**
-	* @covers FileResource::getTemplateTimestamp()
-	* @covers FileResource::resolveTemplateName()
-	* @covers FileResource::getRealFilepath()
+	* @covers FolderResource::getTemplateTimestamp()
+	* @covers FolderResource::resolveTemplateName()
+	* @covers FolderResource::getRealFilepath()
 	*/
 	function testGetTemplateTimestamp()
 	{
-		$resource = new FileResource(
+		$resource = new FolderResource(
 			__DIR__ . '/../templates'
 			);
-		$timestamp = $resource->getTemplateTimestamp('Resources/FileResource.tpl');
+		$timestamp = $resource->getTemplateTimestamp('Resources/FolderResource.tpl');
 		$this->assertTrue( 0 !== $timestamp);
 		$this->assertIsInt( $timestamp );
 	}
