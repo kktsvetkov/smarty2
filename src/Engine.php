@@ -117,7 +117,7 @@ class Engine
      * @var boolean
      *
      */
-    public bool $use_sub_dirs	  = false;
+    public bool $use_sub_dirs = false;
 
     /**
      * This is a list of the modifiers to apply to all template variables.
@@ -155,7 +155,7 @@ class Engine
      *
      * @var string function name
      */
-    var $default_template_handler_func = '';
+    // var $default_template_handler_func = '';
 
     /**
      * The class used for compiling templates.
@@ -585,17 +585,35 @@ class Engine
 		return Kit\Files::unlink($smarty_compile_tpl, $exp_time);
 	}
 
-    /**
-     * Checks whether requested template exists.
-     *
-     * @param string $tpl_file
-     * @return boolean
-     */
-    function template_exists($tpl_file)
-    {
-	$_params = array('resource_name' => $tpl_file, 'quiet'=>true, 'get_source'=>false);
-	return $this->_fetch_resource_info($_params);
-    }
+	/**
+	* Checks whether requested template exists.
+	*
+	* @param string $tpl_file
+	* @return boolean
+	*/
+	function template_exists($tpl_file) : bool
+	{
+		// split resource type from resource name
+		//
+		[$_resource_type, $_resource_name] = $this->parseResourceName(
+			$tpl_file
+			);
+
+		// unknown resource type ?
+		//
+		try {
+			if (!$resource = $this->getResource( $_resource_type ))
+			{
+				return false;
+			}
+		}
+		catch (Exception\ResourceException $e)
+		{
+			return false;
+		}
+
+		return $resource->templateExists($_resource_name);
+	}
 
 
     /**
@@ -611,17 +629,17 @@ class Engine
     }
 
 
-    /**
-     * executes & displays the template results
-     *
-     * @param string $resource_name
-     * @param string $deprecated_cache_id
-     * @param string $compile_id
-     */
-    function display($resource_name, $deprecated_cache_id = null, $compile_id = null)
-    {
-	$this->fetch($resource_name, $deprecated_cache_id, $compile_id, true);
-    }
+	/**
+	* executes & displays the template results
+	*
+	* @param string $resource_name
+	* @param string $deprecated_cache_id
+	* @param string $compile_id
+	*/
+	function display($resource_name, $deprecated_cache_id = null, $compile_id = null)
+	{
+		$this->fetch($resource_name, $deprecated_cache_id, $compile_id, true);
+	}
 
     /**
      * executes & returns or displays the template results
