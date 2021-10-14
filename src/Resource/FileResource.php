@@ -2,6 +2,7 @@
 
 namespace Smarty2\Resource;
 
+use Smarty2\Exception;
 use Smarty2\Resource\ResourceInterface;
 
 use const DIRECTORY_SEPARATOR;
@@ -10,6 +11,7 @@ use function file_get_contents;
 use function filemtime;
 use function is_file;
 use function is_readable;
+use function realpath;
 
 class FileResource implements ResourceInterface
 {
@@ -18,6 +20,11 @@ class FileResource implements ResourceInterface
 	function __construct(string $templateDir)
 	{
 		$this->templateDir = $templateDir;
+	}
+
+	function getTemplateDir() : string
+	{
+		return $this->templateDir;
 	}
 
 	function templateExists(string $name) : bool
@@ -32,7 +39,7 @@ class FileResource implements ResourceInterface
 		return file_get_contents($fullpath);
 	}
 
-	function getTemplateTimestamp(string $name) : integer
+	function getTemplateTimestamp(string $name) : int
 	{
 		$fullpath = $this->getRealFilepath( $name );
 		return filemtime($fullpath);
@@ -48,11 +55,12 @@ class FileResource implements ResourceInterface
 		$fullpath = $this->resolveTemplateName( $name );
 		if (is_file($fullpath) && is_readable($fullpath))
 		{
-			throw new \InvalidArgumentException(
-				"Template not found: '{$name}' at {$fullpath}"
-			);
+			return realpath($fullpath);
 		}
 
-		return $filepath;
+		throw new Exception\TemplateNotFoundException(
+			"Template not found: '{$name}' at {$fullpath}",
+			$name
+		);
 	}
 }

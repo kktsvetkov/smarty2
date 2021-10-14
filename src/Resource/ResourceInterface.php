@@ -6,5 +6,5 @@ interface ResourceInterface
 {
 	function templateExists(string $name) : bool;
 	function getTemplateSource(string $name) : string;
-	function getTemplateTimestamp(string $name) : integer;
+	function getTemplateTimestamp(string $name) : int;
 }
