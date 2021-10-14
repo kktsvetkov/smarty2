@@ -932,10 +932,10 @@ class Engine
 	{
 		return $this->resourceAggregate ??
 			($this->resourceAggregate = new Resource\Aggregate)
-				// ->register('file', new Resource\FolderResource(
-				// 	$this->template_dir,
-				// 	$this->use_sub_dirs
-				// ))
+				->register('file', new Resource\FolderResource(
+					$this->template_dir,
+					$this->use_sub_dirs
+				))
 				;
 	}
 
