@@ -946,7 +946,11 @@ class Engine
 	{
 		return $this->resourceAggregate ??
 			($this->resourceAggregate = new Resource\Aggregate)
-				->register('file', new Resource\FileResource);
+				// ->register('file', new Resource\FileResource(
+				// 	$this->template_dir,
+				// 	$this->use_sub_dirs
+				// ))
+				;
 	}
 
 	function setResourceAggregate(Resource\AggregateInterface $resourceAggregate) : self
@@ -1027,27 +1031,55 @@ class Engine
 			}
 		}
 
-		// call resource functions to fetch the template source and timestamp
-		if ($params['get_source'])
+		// unknown resource type ?
+		//
+		if (!$resource = $this->getResourceAggregate()->getType( $_resource_type ))
 		{
-			$_source_return = isset($this->_plugins['resource'][$_resource_type])
-			&& call_user_func_array(
-				$this->_plugins['resource'][$_resource_type][0][0],
-				array(&$_resource_name, &$params['source_content'], &$this)
-				);
-		} else
-		{
-			$_source_return = true;
+			try {
+				$resource = $this->getResource( $_resource_type );
+			}
+			catch (Exception\ResourceException $e)
+			{
+				if ($params['quiet'])
+				{
+					return false;
+				}
+
+				throw $e;
+			}
 		}
 
-		$_timestamp_return = isset($this->_plugins['resource'][$_resource_type])
-			&& call_user_func_array(
-				$this->_plugins['resource'][$_resource_type][0][1],
-				array(&$_resource_name, &$params['resource_timestamp'], &$this)
+		// call resource functions to fetch the template source and timestamp
+		//
+		if ($resource->templateExists($_resource_name))
+		{
+			if ($params['get_source'])
+			{
+				if ($contents = $resource->getTemplateSource( $_resource_name ))
+				{
+					$params['source_content'] = $contents;
+					return true;
+				}
+			}
+
+			if ($timestamp = $resource->getTemplateTimestamp($_resource_name))
+			{
+				$params['resource_timestamp'] = $timestamp;
+				return true;
+			}
+		}
+
+		if (!$params['quiet'])
+		{
+			throw new Exception\TemplateNotFoundException(
+				"Unable to read resource {$_resource_type}:{$_resource_name}",
+				"{$_resource_type}:{$_resource_name}"
 				);
+		}
 
-		$_return = $_source_return && $_timestamp_return;
+		return false;
 
+		/* KT: to be later supported in a different way
 		if (!$_return)
 		{
 			// see if we can get a template with the default template handler
@@ -1071,18 +1103,7 @@ class Engine
 				}
 			}
 		}
-
-		if (!$_return)
-		{
-			if (!$params['quiet'])
-			{
-				$this->trigger_error(
-					"Unable to read resource {$_resource_type}:{$_resource_name}"
-					);
-			}
-		}
-
-		return $_return;
+		*/
 	}
 
 	/**
