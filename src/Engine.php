@@ -4,6 +4,7 @@ namespace Smarty2;
 
 use Smarty2\Exception;
 use Smarty2\Security\Policy as SecurityPolicy;
+use Smarty2\Resource;
 
 /**
 * Smarty2 - the PHP template engine
@@ -921,6 +922,21 @@ class Engine
 			$resource_name,
 			$compile_id ?? $this->compile_id
 			);
+	}
+
+	protected Resource\AggregateInterface $resourceAggregate;
+
+	function getResourceAggregate() : Resource\AggregateInterface
+	{
+		return $this->resourceAggregate ??
+			($this->resourceAggregate = new Resource\Aggregate)
+				->register('file', new Resource\FileResource);
+	}
+
+	function setResourceAggregate(Resource\AggregateInterface $resourceAggregate) : self
+	{
+		$this->resourceAggregate = $resourceAggregate;
+		return $this;
 	}
 
 	/**
