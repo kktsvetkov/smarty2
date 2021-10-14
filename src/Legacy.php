@@ -3,6 +3,8 @@
 namespace Smarty2;
 
 use Smarty2\Security\LegacyPolicy as SecurityPolicy;
+use Smarty2\Exception;
+use Smarty2\Resource;
 
 /**
 * Legacy Smarty2 - the PHP template engine
@@ -70,6 +72,71 @@ class Legacy extends Engine
 				$null,
 				$null
 			);
+	}
+
+
+	/**
+	* Registers a resource to fetch a template
+	*
+	* @param string $type name of resource
+	* @param array $functions array of functions to handle resource
+	* @return self
+	*/
+	function register_resource(string $type, array $functions) : self
+	{
+		// With 4 elements the elements are the functions-callbacks
+		// for the respective source, timestamp, secure and trusted
+		// functions of the resource.
+		//
+		// Note: secure and trusted functions are no longer used
+		//
+		if (4 == count($functions))
+		{
+			$this->getResourceAggregate()->register($type,
+				new Resource\CustomResource(
+					$functions[0],	/* source */
+					$functions[1],	/* timestamp */
+					$this
+					));
+			return $this;
+		}
+
+		// With 5 elements the first element has to be an
+		// object reference or a class name of the object
+		// or class implementing the resource and the 4
+		// following elements have to be the method names
+		// implementing source, timestamp, secure and trusted.
+		//
+		// Note: secure and trusted functions are no longer used
+		//
+		if (5 == count($functions))
+		{
+			$this->getResourceAggregate()->register($type,
+				new Resource\CustomResource(
+					array(&$functions[0], $functions[1]), /* source */
+					array(&$functions[0], $functions[2]),  /* timestamp */
+					$this
+					));
+
+			return $this;
+		}
+
+		throw new Exception\ResourceException(
+			"Malformed function-list for '{$type}' resource in "
+				. __METHOD__ . '()'
+			);
+	}
+
+	/**
+	* Unregisters a resource
+	*
+	* @param string $type name of resource
+	* @return self
+	*/
+	function unregister_resource($type) : self
+	{
+		$this->getResourceAggregate()->unregister($type);
+		return $this;
 	}
 
 	/**#@+
