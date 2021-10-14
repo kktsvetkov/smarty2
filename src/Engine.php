@@ -641,85 +641,120 @@ class Engine
 		$this->fetch($resource_name, $deprecated_cache_id, $compile_id, true);
 	}
 
-    /**
-     * executes & returns or displays the template results
-     *
-     * @param string $resource_name
-     * @param string $deprecated_cache_id
-     * @param string $compile_id
-     * @param boolean $display
-     */
-    function fetch($resource_name, $deprecated_cache_id = null, $compile_id = null, $display = false)
-    {
-	$_smarty_old_error_level = $this->debugging ? error_reporting() : error_reporting(isset($this->error_reporting)
-	       ? $this->error_reporting : error_reporting() & ~E_NOTICE);
+	/**
+	* executes & returns or displays the template results
+	*
+	* @param string $resource_name
+	* @param string $deprecated_cache_id
+	* @param string $compile_id
+	* @param boolean $display
+	*/
+	function fetch($resource_name, $deprecated_cache_id = null, $compile_id = null, $display = false)
+	{
+		$_smarty_old_error_level = $this->debugging
+			? error_reporting()
+			: error_reporting(
+				isset($this->error_reporting)
+					? $this->error_reporting
+				: error_reporting() & ~E_NOTICE
+			);
 
-	if ($this->debugging) {
-	    // capture time for debugging info
-
-	    $_debug_start_time = microtime(true);
-	    $this->_smarty_debug_info[] = array('type'      => 'template',
-						'filename'  => $resource_name,
-						'depth'     => 0);
-	    $_included_tpls_idx = count($this->_smarty_debug_info) - 1;
-	}
-
-	if (!isset($compile_id)) {
-	    $compile_id = $this->compile_id;
-	}
-
-	$this->_compile_id = $compile_id;
-	$this->_inclusion_depth = 0;
-
-	// load filters that are marked as autoload
-	if (!empty($this->autoload_filters)) {
-	    foreach ($this->autoload_filters as $_filter_type => $_filters) {
-		foreach ($_filters as $_filter) {
-		    $this->load_filter($_filter_type, $_filter);
-		}
-	    }
-	}
-
-	$_smarty_compile_path = $this
-		->getCompiledDepot()
-		->getCompiledFilename($resource_name, $compile_id);
-
-	// if we just need to display the results, don't perform output
-	// buffering - for speed
-	if ($display && count($this->_plugins['outputfilter']) == 0) {
-	    if ($this->_is_compiled($resource_name, $this->_compile_id)
-		    || $this->_compile_resource($resource_name, $_smarty_compile_path))
-	    {
-		include($_smarty_compile_path);
-	    }
-	} else {
-	    ob_start();
-	    if ($this->_is_compiled($resource_name, $this->_compile_id)
-		    || $this->_compile_resource($resource_name, $_smarty_compile_path))
-	    {
-		include($_smarty_compile_path);
-	    }
-	    $_smarty_results = ob_get_contents();
-	    ob_end_clean();
-
-	    foreach ((array)$this->_plugins['outputfilter'] as $_output_filter) {
-		$_smarty_results = call_user_func_array($_output_filter[0], array($_smarty_results, &$this));
-	    }
-	}
-
-	if ($display) {
-	    if (isset($_smarty_results)) { echo $_smarty_results; }
-	    if ($this->debugging) {
 		// capture time for debugging info
-		$this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] = (microtime(true) - $_debug_start_time);
-	    }
-	    error_reporting($_smarty_old_error_level);
-	    return;
-	} else {
-	    error_reporting($_smarty_old_error_level);
-	    if (isset($_smarty_results)) { return $_smarty_results; }
+		if ($this->debugging)
+		{
+			$_debug_start_time = microtime(true);
+
+			$this->_smarty_debug_info[] = array(
+				'type' => 'template',
+				'filename' => $resource_name,
+				'depth' => 0);
+
+			$_included_tpls_idx = count($this->_smarty_debug_info) - 1;
+		}
+
+		$compile_id = $compile_id ?? $this->compile_id;
+
+		$this->_compile_id = $compile_id;
+		$this->_inclusion_depth = 0;
+
+		// load filters that are marked as autoload
+		//
+		if (!empty($this->autoload_filters))
+		{
+			foreach ($this->autoload_filters as $_filter_type => $_filters)
+			{
+				foreach ($_filters as $_filter)
+				{
+					$this->load_filter($_filter_type, $_filter);
+				}
+			}
+		}
+
+		$_smarty_compile_path = $this
+			->getCompiledDepot()
+			->getCompiledFilename($resource_name, $compile_id);
+
+		// is it compiled ?
+		//
+		if (!$this->_is_compiled($resource_name, $this->_compile_id))
+		{
+			// can you compile it ?
+			//
+			if (!$this->_compile_resource($resource_name, $_smarty_compile_path))
+			{
+				throw new \UnexpectedValueException(
+					"Unable to compile {$resource_name} into {$_smarty_compile_path}"
+				);
+			}
+		}
+
+		// if we just need to display the results, don't perform output
+		// buffering - for speed
+		if ($display && count($this->_plugins['outputfilter']) == 0)
+		{
+			include($_smarty_compile_path);
+		} else
+		{
+			ob_start();
+			include($_smarty_compile_path);
+
+			$_smarty_results = ob_get_contents();
+			ob_end_clean();
+
+			foreach ((array)$this->_plugins['outputfilter'] as $_output_filter)
+			{
+				$_smarty_results = call_user_func_array(
+					$_output_filter[0],
+					array($_smarty_results, &$this)
+					);
+			}
+		}
+
+		// capture time for debugging info
+		if ($this->debugging)
+		{
+			$this->_smarty_debug_info[$_included_tpls_idx]['exec_time'] =
+				microtime(true) - $_debug_start_time;
+		}
+
+		if ($display)
+		{
+			if (isset($_smarty_results))
+			{
+				echo $_smarty_results;
+			}
+
+			error_reporting($_smarty_old_error_level);
+			return;
+		} else
+		{
+			error_reporting($_smarty_old_error_level);
+			if (isset($_smarty_results))
+			{
+				return $_smarty_results;
+			}
+		}
 	}
-    }
 
 
 	/**
