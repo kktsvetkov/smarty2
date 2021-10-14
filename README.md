@@ -83,6 +83,20 @@ Some of Smarty's features:
   is so customizable.
 * and many more.
 
+## Resources
+
+Template contents are read from **resource** objects. You can create new
+resources using `Smarty2\Resource\ResourceInterface`, or you can re-use some of
+the existing resources, such as:
+
+- `FolderResource` reads templates from a folder
+- `CustomResource` is wrapper for the custom resource code from `register_resource()` method
+- `PluginResource` is a wrapper for plugin resources, e.g. `plugins/resource.file.php`
+
+The old `register_resource()` and `unregister_resource()` are preserved, and the
+custom callbacks used in them for the resources are used through the `CustomResource`
+class.
+
 ## Security
 
 The old security settings at `$smarty->security` and `$smarty->security_settings`
@@ -221,6 +235,6 @@ Few more things stripped form this project:
 
 #### Smarty2\\Legacy
 
-All of the deprecated methods are kept in the `Smarty2\\Legacy` class. They
+All of the deprecated methods are kept in the `Smarty2\Legacy` class. They
 are all empty and do nothing, but at least your code should be able to continue
 your existing code without any real big changes.
