@@ -605,6 +605,26 @@ class Engine
     }
 
     /**
+     * Returns an array containing template variables
+     *
+     * @param string $name
+     * @param string $type
+     * @return array
+     */
+    function &get_template_vars($name=null)
+    {
+	if(!isset($name)) {
+	    return $this->_tpl_vars;
+	} elseif(isset($this->_tpl_vars[$name])) {
+	    return $this->_tpl_vars[$name];
+	} else {
+	    // var non-existant, return valid reference
+	    $_tmp = null;
+	    return $_tmp;
+	}
+    }
+
+    /**
      * clears compiled version of specified template resource
      *
      * @param string $tpl_file
@@ -630,25 +650,6 @@ class Engine
 	return $this->_fetch_resource_info($_params);
     }
 
-    /**
-     * Returns an array containing template variables
-     *
-     * @param string $name
-     * @param string $type
-     * @return array
-     */
-    function &get_template_vars($name=null)
-    {
-	if(!isset($name)) {
-	    return $this->_tpl_vars;
-	} elseif(isset($this->_tpl_vars[$name])) {
-	    return $this->_tpl_vars[$name];
-	} else {
-	    // var non-existant, return valid reference
-	    $_tmp = null;
-	    return $_tmp;
-	}
-    }
 
     /**
      * trigger Smarty error
